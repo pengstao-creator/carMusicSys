@@ -7,7 +7,6 @@
 #include <QFileInfo>
 #include <QResizeEvent>
 #include <QPainter>
-#include <QDebug>
 
 #include <QUrl>
 
@@ -80,37 +79,26 @@ BackgroundWidget::~BackgroundWidget()
 
 void BackgroundWidget::setBackground(const QString &filePath)
 {
-    qDebug() << "setBackground called with filePath:" << filePath;
     QFileInfo info(filePath);
     QString suffix = info.suffix().toLower();
-    qDebug() << "File suffix:" << suffix;
-    
-    // 隐藏播放器的所有类型
-    qDebug() << "Hiding all players";
-    m_player->hidePlayer(PlayerType::NONPLAYER);
     
     // 根据文件类型设置播放器
     if (suffix == "png" || suffix == "jpg" || suffix == "jpeg") {
-        qDebug() << "Switching to PIXMAP player";
         m_player->switchPlayer(PlayerType::PIXMAP);
         m_player->setupPixmap(filePath);
     } else if (suffix == "gif") {
-        qDebug() << "Switching to MOVIE player";
         m_player->switchPlayer(PlayerType::MOVIE);
         m_player->setupMovie(filePath);
     } else if (suffix == "mp4") {
-        qDebug() << "Switching to VIDEO player";
         bool switched = m_player->switchPlayer(PlayerType::VIDEO);
         // 即使类型相同，也要确保视频项可见
         if (!switched) {
-            qDebug() << "Same player type, ensuring video item is visible";
             m_player->getVideoItem()->setVisible(true);
         }
         m_player->setupVideo(filePath);
         // 确保视频项大小正确
         m_player->setVideoSize(size());
     } else {
-        qDebug() << "Unsupported file format";
         return;
     }
     
