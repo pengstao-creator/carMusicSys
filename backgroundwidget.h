@@ -32,9 +32,7 @@ private:
 
     std::unique_ptr<QGraphicsScene> m_scene;            // 场景
     std::unique_ptr<Overlay> m_overlay;         // 覆盖层（透明容器）
-    std::unique_ptr<Player> m_player_1;            // 播放器1
-    std::unique_ptr<Player> m_player_2;            // 播放器2
-    Player* m_currentPlayer;           // 当前活跃播放器
+    std::unique_ptr<Player> m_player;            // 播放器
     QString m_currentFile;              // 当前文件路径
 };
 
