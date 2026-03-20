@@ -1,5 +1,6 @@
 #include "Player.h"
 #include <QDebug>
+
 #include <QUrl>
 #include <QString>
 #include <QGraphicsPixmapItem>
@@ -14,8 +15,8 @@ Player::Player(QObject *parent)
     , m_pixmapItem(std::make_unique<QGraphicsPixmapItem>())
     , m_videoItem(std::make_unique<QGraphicsVideoItem>())
     , m_movie(std::make_unique<QMovie>())
-    , m_mediaPlayer(std::make_unique<QMediaPlayer>())
     , m_audioOutput(std::make_unique<QAudioOutput>())
+    , m_mediaPlayer(std::make_unique<QMediaPlayer>())
     , ptype(PlayerType::NONPLAYER)
 {
 }
@@ -27,6 +28,12 @@ Player::~Player()
 
 void Player::setPlayer()
 {
+    // 确保所有智能指针都已初始化
+    if (!m_pixmapItem || !m_videoItem || !m_movie || !m_mediaPlayer || !m_audioOutput) {
+        qDebug() << "Error: Some smart pointers are not initialized";
+        return;
+    }
+    
     m_pixmapItem->setZValue(0);          // 底层
     m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
     
@@ -58,17 +65,22 @@ void Player::setPlayer()
 
 bool Player::hidePlayer(PlayerType type)
 {
+    qDebug() << "hidePlayer called with type:" << static_cast<int>(type);
+    
     if(type == PlayerType::VIDEO)
     {
+        qDebug() << "Hiding VIDEO player";
         m_mediaPlayer->stop();//清除视频资源，黑屏显示，播放位置重置为0
         m_videoItem->setVisible(false);//设置隐藏
     }
     else if(type == PlayerType::PIXMAP || type == PlayerType::MOVIE)
     {
+        qDebug() << "Hiding PIXMAP/MOVIE player";
         m_pixmapItem->hide();
     }
     else if(type == PlayerType::NONPLAYER)
     {
+        qDebug() << "Hiding ALL players";
         // 隐藏所有类型的播放器
         m_mediaPlayer->stop();
         m_videoItem->setVisible(false);
@@ -76,6 +88,7 @@ bool Player::hidePlayer(PlayerType type)
     }
     else
     {
+        qDebug() << "Invalid player type";
         return false;
     }
     return true;
@@ -83,16 +96,21 @@ bool Player::hidePlayer(PlayerType type)
 
 bool Player::showPlayer(PlayerType type)
 {
+    qDebug() << "showPlayer called with type:" << static_cast<int>(type);
+    
     if(type == PlayerType::VIDEO)
     {
+        qDebug() << "Showing VIDEO player";
         m_videoItem->setVisible(true);//展示
     }
     else if(type == PlayerType::PIXMAP || type == PlayerType::MOVIE)
     {
+        qDebug() << "Showing PIXMAP/MOVIE player";
         m_pixmapItem->show();
     }
     else
     {
+        qDebug() << "Invalid player type";
         return false;
     }
     return true;
@@ -100,48 +118,65 @@ bool Player::showPlayer(PlayerType type)
 
 bool Player::switchPlayer(PlayerType type)
 {
+    qDebug() << "switchPlayer called with type:" << static_cast<int>(type);
+    qDebug() << "Current player type:" << static_cast<int>(ptype);
+    
     if(type == PlayerType::NONPLAYER || type == ptype)
     {
+        qDebug() << "No switch needed, same type or NONPLAYER";
         //当前类型和需要切换类型相同或者无类型不需要切换
         return false;
     }
 
     //需要切换先隐藏当前播放器
+    qDebug() << "Hiding current player type:" << static_cast<int>(ptype);
     hidePlayer(ptype);
     //展示需要的播放器
+    qDebug() << "Showing new player type:" << static_cast<int>(type);
     showPlayer(type);
 
     ptype = type;
+    qDebug() << "Switch completed, new player type:" << static_cast<int>(ptype);
     return true;
 }
 
 void Player::setupPixmap(const QString &path)
 {
+    qDebug() << "setupPixmap called with path:" << path;
     QPixmap pix(path);
     if (pix.isNull()) {
-        qWarning() << "Failed to load image:" << path;
+        qDebug() << "Failed to load pixmap";
         return;
     }
+    qDebug() << "Pixmap loaded successfully";
     m_pixmapItem->setPixmap(pix);
 }
 
 void Player::setupMovie(const QString &path)
 {
+    qDebug() << "setupMovie called with path:" << path;
     m_movie->setFileName(path);
     if (!m_movie->isValid()) {
-        qWarning() << "Failed to load GIF:" << path;
+        qDebug() << "Failed to load movie";
         return;
     }
+    qDebug() << "Movie loaded successfully";
 
     // 初始用第一帧
     QPixmap pix = m_movie->currentPixmap();
     m_pixmapItem->setPixmap(pix);
     m_movie->start();
+    qDebug() << "Movie started";
 }
 
 void Player::setupVideo(const QString &path)
 {
-    qDebug() << "Loading video:" << path;
+    qDebug() << "setupVideo called with path:" << path;
+    // 确保视频项可见
+    if (m_videoItem) {
+        m_videoItem->setVisible(true);
+        qDebug() << "Video item visibility set to true";
+    }
     m_mediaPlayer->setSource(QUrl::fromLocalFile(path));
     m_mediaPlayer->play();
     qDebug() << "Video playback started";

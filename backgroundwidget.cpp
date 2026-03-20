@@ -8,6 +8,7 @@
 #include <QResizeEvent>
 #include <QPainter>
 #include <QDebug>
+
 #include <QUrl>
 
 BackgroundWidget::BackgroundWidget(QWidget *parent)
@@ -16,16 +17,10 @@ BackgroundWidget::BackgroundWidget(QWidget *parent)
     , m_overlay(std::make_unique<Overlay>())
     , m_player(std::make_unique<Player>())
 {
-    qDebug() << "BackgroundWidget constructor started";
     //设置背景，视图属性，创建覆盖层基本属性
-    qDebug() << "Calling setBaseQWidget()";
     setBaseQWidget();
-    qDebug() << "setBaseQWidget() completed";
     //设置相关播放器
-    qDebug() << "Calling setPlayer()";
     setPlayer();
-    qDebug() << "setPlayer() completed";
-    qDebug() << "BackgroundWidget constructor completed";
 }
 
 
@@ -69,12 +64,11 @@ void BackgroundWidget::setPlayer()
                     auto videoItem = m_player->getVideoItem();
                     QSizeF videoSize = videoItem->nativeSize();
                     if (videoSize.isValid()) {
-                        // 设置宽高比模式
-                        videoItem->setAspectRatioMode(Qt::KeepAspectRatioByExpanding);
-                        // 然后设置目标矩形仍为视图大小
-                        videoItem->setSize(size());
-                        qDebug() << "重新设置视频大小成功";
-                    }
+                            // 设置宽高比模式
+                            videoItem->setAspectRatioMode(Qt::KeepAspectRatioByExpanding);
+                            // 然后设置目标矩形仍为视图大小
+                            videoItem->setSize(size());
+                        }
                 }
             });
 }
@@ -86,26 +80,37 @@ BackgroundWidget::~BackgroundWidget()
 
 void BackgroundWidget::setBackground(const QString &filePath)
 {
+    qDebug() << "setBackground called with filePath:" << filePath;
     QFileInfo info(filePath);
     QString suffix = info.suffix().toLower();
+    qDebug() << "File suffix:" << suffix;
     
     // 隐藏播放器的所有类型
+    qDebug() << "Hiding all players";
     m_player->hidePlayer(PlayerType::NONPLAYER);
     
     // 根据文件类型设置播放器
     if (suffix == "png" || suffix == "jpg" || suffix == "jpeg") {
+        qDebug() << "Switching to PIXMAP player";
         m_player->switchPlayer(PlayerType::PIXMAP);
         m_player->setupPixmap(filePath);
     } else if (suffix == "gif") {
+        qDebug() << "Switching to MOVIE player";
         m_player->switchPlayer(PlayerType::MOVIE);
         m_player->setupMovie(filePath);
     } else if (suffix == "mp4") {
-        m_player->switchPlayer(PlayerType::VIDEO);
+        qDebug() << "Switching to VIDEO player";
+        bool switched = m_player->switchPlayer(PlayerType::VIDEO);
+        // 即使类型相同，也要确保视频项可见
+        if (!switched) {
+            qDebug() << "Same player type, ensuring video item is visible";
+            m_player->getVideoItem()->setVisible(true);
+        }
         m_player->setupVideo(filePath);
         // 确保视频项大小正确
         m_player->setVideoSize(size());
     } else {
-        qWarning() << "Unsupported format:" << suffix;
+        qDebug() << "Unsupported file format";
         return;
     }
     

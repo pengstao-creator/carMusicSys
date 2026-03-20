@@ -8,19 +8,12 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , wallpaper(new WallpaperLoad(this))
 {
-    qDebug() << "MainWindow constructor started";
     ui->setupUi(this);
-    qDebug() << "ui->setupUi completed";
 
     //设置窗口属性
-    qDebug() << "Calling setMainWindow()";
     setMainWindow();
-    qDebug() << "setMainWindow() completed";
     //设置壁纸
-    qDebug() << "Calling setWallpaper()";
     setWallpaper();
-    qDebug() << "setWallpaper() completed";
-    qDebug() << "MainWindow constructor completed";
 }
 
 MainWindow::~MainWindow()
