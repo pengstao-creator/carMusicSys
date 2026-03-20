@@ -1,41 +1,24 @@
-# Prerequisites
-*.d
+# Qt build files
+build/
+Makefile
+Makefile.Debug
+Makefile.Release
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Qt creator files
+.qtcreator/
+carMusicSys.pro.user
+.qmake.stash
 
-# Precompiled Headers
-*.gch
-*.pch
+# CMake files
+CMakeLists.txt
 
-# Linker files
-*.ilk
+# Resource files (wallpapers)
+Wallpaper/
 
-# Debugger Files
-*.pdb
+# IDE files
+.idea/
+.vscode/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
+# OS files
+.DS_Store
+Thumbs.db
