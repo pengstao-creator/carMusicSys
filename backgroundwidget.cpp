@@ -93,11 +93,14 @@ BackgroundWidget::~BackgroundWidget()
 }
 void BackgroundWidget::setPathFirst(const QString &filePath1, const QString &filePath2)
 {
-    setBackground(filePath1,m_player_1.get(),true);
-    setBackground(filePath2,m_player_2.get(),false);
-    // 设置当前文件名为第一个文件的文件名
-    QFileInfo info(filePath1);
+    setBackground(filePath1,m_player_1.get());
+    m_player_1->showPlayer(ptype);
+    setBackground(filePath2,m_player_2.get());
+    m_player_2->hidePlayer(PlayerType::NONPLAYER);
+    // 设置当前文件名为第二个文件的文件名
+    QFileInfo info(filePath2);
     m_currentFile = info.fileName();
+    qDebug() << "m_player_1"<<filePath1;
 }
 
 
@@ -106,43 +109,42 @@ void BackgroundWidget::setPath(const QString &filePath)
     if(is_player_1)
     {
         m_player_2->showPlayer(ptype);
-        setBackground(filePath,m_player_1.get(),false);
+        qDebug() << "m_player_2"<<filePath;
+
+        setBackground(filePath,m_player_1.get());
+        m_player_1->hidePlayer(PlayerType::NONPLAYER);
         is_player_1 = false;
     }
     else
     {
         m_player_1->showPlayer(ptype);
-        setBackground(filePath,m_player_2.get(),false);
+        qDebug() << "m_player_1"<<filePath;
+
+        setBackground(filePath,m_player_2.get());
+        m_player_2->hidePlayer(PlayerType::NONPLAYER);
         is_player_1 = true;
     }
     // 只存储文件名，而不是完整路径
     QFileInfo info(filePath);
     m_currentFile = info.fileName();
+
 }
 
-void BackgroundWidget::setBackground(const QString &filePath1,Player * player,bool isplayer)
+void BackgroundWidget::setBackground(const QString &filePath1,Player * player)
 {
     QFileInfo info(filePath1);
     QString suffix = info.suffix().toLower();
 
-    //判断是否为后台加载
-    if(!isplayer)
-    {
-        player->hidePlayer(PlayerType::NONPLAYER);
-    }
     // 根据文件类型设置播放器
     if (suffix == "png" || suffix == "jpg" || suffix == "jpeg") {
         player->setupPixmap(filePath1);
-        if(isplayer){player->showPlayer(PlayerType::PIXMAP);}
-        else {ptype = PlayerType::PIXMAP;}
+        ptype = PlayerType::PIXMAP;
     } else if (suffix == "gif") {
         player->setupMovie(filePath1);
-        if(isplayer){player->showPlayer(PlayerType::MOVIE);}
-        else {ptype = PlayerType::MOVIE;}
+        ptype = PlayerType::MOVIE;
     } else if (suffix == "mp4") {
         player->setupVideo(filePath1);
-        if(isplayer){player->showPlayer(PlayerType::VIDEO);}
-        else {ptype = PlayerType::VIDEO;}
+        ptype = PlayerType::VIDEO;
     } else {
         return;
     }

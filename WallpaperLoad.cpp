@@ -5,7 +5,7 @@
 
 WallpaperLoad::WallpaperLoad(QObject *parent)
     : QObject(parent)
-    , _stime(1000*1)
+    , _stime(1000*5)
     , _switchTime(std::make_unique<QTimer>(this->parent()))
 {
     // 设置定时器
@@ -29,6 +29,7 @@ void WallpaperLoad::setPath(const QString &path)
     QDir dir(_path);
     _wallpapers = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
     // 将第一张第二张先添加设为壁纸
+    qDebug() <<_wallpapers;
     if(!_wallpapers.isEmpty() && _wallpaper)
     {
         if(_wallpapers.size() >= 2)

@@ -58,7 +58,7 @@ bool Player::hidePlayer(PlayerType type)
 {
     if(type == PlayerType::VIDEO)
     {
-        m_mediaPlayer->stop();//清除视频资源，黑屏显示，播放位置重置为0
+        m_mediaPlayer->pause();//清除视频资源，黑屏显示，播放位置重置为0
         m_videoItem->setVisible(false);//设置隐藏
 
     }
@@ -69,7 +69,7 @@ bool Player::hidePlayer(PlayerType type)
     else if(type == PlayerType::NONPLAYER)
     {
         // 隐藏所有类型的播放器
-        m_mediaPlayer->stop();
+        m_mediaPlayer->pause();
         m_videoItem->setVisible(false);
         m_pixmapItem->hide();
     }
@@ -140,6 +140,7 @@ void Player::setupMovie(const QString &path)
 void Player::setupVideo(const QString &path)
 {
     m_mediaPlayer->setSource(QUrl::fromLocalFile(path));
+    m_mediaPlayer->play();
 }
 
 void Player::setVideoSize(const QSize &size)

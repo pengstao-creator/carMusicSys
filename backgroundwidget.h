@@ -33,7 +33,7 @@ protected:
 private:
     void setBaseQWidget();
     void setPlayer();
-    void setBackground(const QString &filePath,Player * player,bool isplayer);
+    void setBackground(const QString &filePath,Player * player);
 
     std::unique_ptr<QGraphicsScene> m_scene;            // 场景
     std::unique_ptr<Player> m_player_1;            // 播放器
