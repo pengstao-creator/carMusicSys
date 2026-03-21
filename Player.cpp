@@ -1,5 +1,5 @@
 #include "Player.h"
-#include <QDebug>
+#include "Data.h"
 #include <QUrl>
 #include <QString>
 #include <QGraphicsPixmapItem>
@@ -25,25 +25,25 @@ Player::~Player()
     // 智能指针会自动管理内存，不需要手动释放
 }
 
-void Player::setPlayer()
+void Player::setPlayer(const qreal z = Layer::LAYER_PLAYER_1)
 {
-    m_pixmapItem->setZValue(0);          // 底层
+    m_pixmapItem->setZValue(z);          // 底层
     m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
     
     // 设置视频输出到该图形项
-    m_videoItem->setZValue(0);
+    m_videoItem->setZValue(z);
     m_mediaPlayer->setAudioOutput(m_audioOutput.get());    // Qt6 方式连接音频
     m_mediaPlayer->setVideoOutput(m_videoItem.get());
 
     // 循环播放
-    connect(m_mediaPlayer.get(), &QMediaPlayer::mediaStatusChanged, nullptr, 
+    connect(m_mediaPlayer.get(), &QMediaPlayer::mediaStatusChanged, this, 
             [this](QMediaPlayer::MediaStatus status) {
                 if (status == QMediaPlayer::EndOfMedia)
                     m_mediaPlayer->play();
             });
 
     // 连接帧更新信号
-    connect(m_movie.get(), &QMovie::frameChanged, nullptr, [this](int /*frame*/) {
+    connect(m_movie.get(), &QMovie::frameChanged, this, [this](int /*frame*/) {
         if (m_pixmapItem) {
             QPixmap pix = m_movie->currentPixmap();
             m_pixmapItem->setPixmap(pix);
@@ -51,9 +51,7 @@ void Player::setPlayer()
     });
 
     // 初始隐藏所有播放器
-    hidePlayer(PlayerType::MOVIE);
-    hidePlayer(PlayerType::PIXMAP);
-    hidePlayer(PlayerType::VIDEO);
+    hidePlayer(PlayerType::NONPLAYER);
 }
 
 bool Player::hidePlayer(PlayerType type)
@@ -86,6 +84,7 @@ bool Player::showPlayer(PlayerType type)
     if(type == PlayerType::VIDEO)
     {
         m_videoItem->setVisible(true);//展示
+        m_mediaPlayer->play();
     }
     else if(type == PlayerType::PIXMAP || type == PlayerType::MOVIE)
     {
@@ -119,7 +118,6 @@ void Player::setupPixmap(const QString &path)
 {
     QPixmap pix(path);
     if (pix.isNull()) {
-        qWarning() << "Failed to load image:" << path;
         return;
     }
     m_pixmapItem->setPixmap(pix);
@@ -129,7 +127,6 @@ void Player::setupMovie(const QString &path)
 {
     m_movie->setFileName(path);
     if (!m_movie->isValid()) {
-        qWarning() << "Failed to load GIF:" << path;
         return;
     }
 
@@ -141,10 +138,8 @@ void Player::setupMovie(const QString &path)
 
 void Player::setupVideo(const QString &path)
 {
-    qDebug() << "Loading video:" << path;
     m_mediaPlayer->setSource(QUrl::fromLocalFile(path));
     m_mediaPlayer->play();
-    qDebug() << "Video playback started";
 }
 
 void Player::setVideoSize(const QSize &size)

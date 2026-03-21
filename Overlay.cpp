@@ -1,11 +1,13 @@
 #include "Overlay.h"
-#include <QWidget>
+#include "ui_overlay.h"
 
 Overlay::Overlay(QGraphicsItem *parent)
     : QGraphicsProxyWidget(parent)
+    , ui(new Ui::Overlay)
 {
-    // 创建一个空的 QWidget
+    // 创建UI窗口
     QWidget *widget = new QWidget();
+    ui->setupUi(widget);
     // 设置透明背景
     widget->setAttribute(Qt::WA_TranslucentBackground);
     widget->setStyleSheet("background: transparent;");
@@ -16,4 +18,5 @@ Overlay::Overlay(QGraphicsItem *parent)
 
 Overlay::~Overlay()
 {
+    delete ui;
 }

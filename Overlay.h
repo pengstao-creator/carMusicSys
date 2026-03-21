@@ -3,6 +3,10 @@
 
 #include <QGraphicsProxyWidget>
 
+namespace Ui {
+class Overlay;
+}
+
 class Overlay : public QGraphicsProxyWidget
 {
     Q_OBJECT
@@ -12,6 +16,7 @@ public:
     ~Overlay();
 
 private:
+    Ui::Overlay *ui;
 };
 
 #endif // OVERLAY_H

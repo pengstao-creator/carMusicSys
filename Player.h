@@ -10,7 +10,6 @@ class QMovie;
 class QMediaPlayer;
 class QAudioOutput;
 
-
 enum class PlayerType {
     NONPLAYER,
     PIXMAP,
@@ -27,8 +26,8 @@ public:
     
     void setupPixmap(const QString &path);   // 静态图片 
     void setupMovie(const QString &path);    // GIF 
-    void setupVideo(const QString &path);    // MP4 
-    void setPlayer(); 
+    void setupVideo(const QString &path);    // MP4
+    void setPlayer(const qreal z);
     bool switchPlayer(PlayerType); 
     bool hidePlayer(PlayerType); 
     bool showPlayer(PlayerType);

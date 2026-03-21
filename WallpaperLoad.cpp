@@ -5,8 +5,9 @@
 
 WallpaperLoad::WallpaperLoad(QObject *parent)
     : QObject(parent)
-    , _stime(1000*1)
+    , _stime(1000*10)
     , _switchTime(std::make_unique<QTimer>(this->parent()))
+    , _wallpaper(std::make_unique<BackgroundWidget>())
 {
     // 设置定时器
     connect(_switchTime.get(), &QTimer::timeout, this, &WallpaperLoad::switchWallpaper);
@@ -28,11 +29,18 @@ void WallpaperLoad::setPath(const QString &path)
     // 获取所有壁纸名称
     QDir dir(_path);
     _wallpapers = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-    qDebug() << _wallpapers ;
-    // 将第一张设为壁纸
+    // 将第一张第二张先添加设为壁纸
     if(!_wallpapers.isEmpty() && _wallpaper)
     {
-        _wallpaper->setBackground(_path + _wallpapers[0]);
+        if(_wallpapers.size() >= 2)
+        {
+            _wallpaper->setPathFirst(_path + _wallpapers[0],_path + _wallpapers[1]);
+        }
+        else
+        {
+            _wallpaper->setPathFirst(_path + _wallpapers[0],_path + _wallpapers[0]);
+        }
+
         _switchTime->start(_stime);
     }
 }
@@ -48,13 +56,12 @@ void WallpaperLoad::switchWallpaper()
         {
             if(is_true)
             {
-                _wallpaper->setBackground(_path + name);
-                qDebug() << name << "-------";
+                _wallpaper->setPath(_path + name);
                 is_true = false;
             }
             if(name == filename) is_true = true;
         }
-        if(is_true) _wallpaper->setBackground(_path + _wallpapers[0]);
+        if(is_true) _wallpaper->setPath(_path + _wallpapers[0]);
     }
 }
 

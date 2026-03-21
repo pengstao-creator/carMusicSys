@@ -27,9 +27,10 @@ private:
     void setWallpaper();
     void switchWallpaper();
     void setTime();
+    QString getWallpaperPath();
 private:
     Ui::MainWindow *ui;
-    QString path = "D:/code/QT/carMusicSys/Wallpaper/";
+    QString path = "./Wallpaper/";
     std::unique_ptr<WallpaperLoad> wallpaper;
 
 };

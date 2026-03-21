@@ -10,7 +10,7 @@ class QGraphicsScene;
 class QGraphicsWidget;
 class Overlay;
 class Player;
-
+enum class PlayerType;
 class BackgroundWidget : public QGraphicsView
 {
     Q_OBJECT
@@ -18,7 +18,8 @@ public:
     explicit BackgroundWidget(QWidget *parent = nullptr);
     ~BackgroundWidget();
     // 设置背景文件（支持 .png .jpg .gif .mp4）
-    void setBackground(const QString &filePath);
+    void setPath(const QString &filePath);
+    void setPathFirst(const QString &filePath1,const QString &filePath2);
     const QString &getFile() const;
     // 获取覆盖层（一个 QGraphicsWidget，可在其上放置其他图形项或代理控件）
     QGraphicsWidget* getOvrlay() const;
@@ -29,12 +30,14 @@ protected:
 private:
     void setBaseQWidget();
     void setPlayer();
+    void setBackground(const QString &filePath,Player * player,bool isplayer);
 
     std::unique_ptr<QGraphicsScene> m_scene;            // 场景
     std::unique_ptr<Overlay> m_overlay;         // 覆盖层（透明容器）
-    std::unique_ptr<Player> m_player_1;            // 播放器1
-    std::unique_ptr<Player> m_player_2;            // 播放器2
-    Player* m_currentPlayer;           // 当前活跃播放器
+    std::unique_ptr<Player> m_player_1;            // 播放器
+    std::unique_ptr<Player> m_player_2;
+    bool is_player_1;
+    PlayerType ptype;
     QString m_currentFile;              // 当前文件路径
 };
 
