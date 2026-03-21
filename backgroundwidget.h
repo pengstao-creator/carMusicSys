@@ -22,8 +22,11 @@ public:
     void setPathFirst(const QString &filePath1,const QString &filePath2);
     const QString &getFile() const;
     // 获取覆盖层（一个 QGraphicsWidget，可在其上放置其他图形项或代理控件）
-    QGraphicsWidget* getOvrlay() const;
+    static const QHash<QString,Overlay*>& getOvrlay() ;
+    QGraphicsScene * getScene()const;
 
+
+    void addOvrlay(const std::pair<QString,Overlay*>& overlay);
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
@@ -33,12 +36,12 @@ private:
     void setBackground(const QString &filePath,Player * player,bool isplayer);
 
     std::unique_ptr<QGraphicsScene> m_scene;            // 场景
-    std::unique_ptr<Overlay> m_overlay;         // 覆盖层（透明容器）
     std::unique_ptr<Player> m_player_1;            // 播放器
     std::unique_ptr<Player> m_player_2;
     bool is_player_1;
     PlayerType ptype;
     QString m_currentFile;              // 当前文件路径
+    QHash<QString,Overlay*> m_overlay;         // 覆盖层（透明容器）
+    static BackgroundWidget* _this;
 };
-
 #endif // BACKGROUNDWIDGET_H

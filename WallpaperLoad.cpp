@@ -5,9 +5,8 @@
 
 WallpaperLoad::WallpaperLoad(QObject *parent)
     : QObject(parent)
-    , _stime(1000*10)
+    , _stime(1000*1)
     , _switchTime(std::make_unique<QTimer>(this->parent()))
-    , _wallpaper(std::make_unique<BackgroundWidget>())
 {
     // 设置定时器
     connect(_switchTime.get(), &QTimer::timeout, this, &WallpaperLoad::switchWallpaper);

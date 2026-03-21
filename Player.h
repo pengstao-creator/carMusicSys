@@ -25,7 +25,7 @@ public:
     ~Player();
     
     void setupPixmap(const QString &path);   // 静态图片 
-    void setupMovie(const QString &path);    // GIF 
+    void setupMovie(const QString &path);    // GIF
     void setupVideo(const QString &path);    // MP4
     void setPlayer(const qreal z);
     bool switchPlayer(PlayerType); 
@@ -47,6 +47,7 @@ private:
     std::unique_ptr<QMovie> m_movie;                    // GIF播放器
     std::unique_ptr<QMediaPlayer> m_mediaPlayer;        // 视频播放器
     std::unique_ptr<QAudioOutput> m_audioOutput;        // 音频输出
+
     PlayerType ptype;                                   // 当前播放器类型
 };
 

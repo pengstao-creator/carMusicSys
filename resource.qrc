@@ -1,5 +1,10 @@
 <RCC>
     <qresource prefix="/">
-        <file>Wallpaper/5.jpg</file>
+        <file>Resource/5.jpg</file>
+        <file>Resource/1.png</file>
+        <file>Resource/2.png</file>
+        <file>Resource/3.png</file>
+        <file>Resource/4.png</file>
+        <file>Resource/6.png</file>
     </qresource>
 </RCC>

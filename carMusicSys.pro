@@ -24,6 +24,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    desktop.cpp \
     main.cpp \
     mainwindow.cpp \
     backgroundwidget.cpp \
@@ -33,6 +34,7 @@ SOURCES += \
 
 HEADERS += \
     Data.h \
+    desktop.h \
     mainwindow.h \
     backgroundwidget.h \
     Overlay.h \
@@ -40,8 +42,8 @@ HEADERS += \
     WallpaperLoad.h
 
 FORMS += \
-    mainwindow.ui \
-    overlay.ui
+    desktop.ui \
+    mainwindow.ui
 RESOURCES += \
     resource.qrc
 

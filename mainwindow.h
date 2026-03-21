@@ -27,10 +27,11 @@ private:
     void setWallpaper();
     void switchWallpaper();
     void setTime();
+    void addOverlay();
     QString getWallpaperPath();
 private:
     Ui::MainWindow *ui;
-    QString path = "./Wallpaper/";
+    QString path ;
     std::unique_ptr<WallpaperLoad> wallpaper;
 
 };

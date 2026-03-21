@@ -8,18 +8,20 @@
 #include <QResizeEvent>
 #include <QPainter>
 #include <QUrl>
+#include <QHash>
 #include "Data.h"
+
+// 初始化静态成员变量
+BackgroundWidget* BackgroundWidget::_this = nullptr;
 BackgroundWidget::BackgroundWidget(QWidget *parent)
     : QGraphicsView(parent)
     , m_scene(std::make_unique<QGraphicsScene>())
-    , m_overlay(std::make_unique<Overlay>())
     , m_player_1(std::make_unique<Player>())
     , m_player_2(std::make_unique<Player>())
     , is_player_1(true)
     , ptype(PlayerType::NONPLAYER)
 {
-
-    qDebug() << "BackgroundWidget"<<size();
+    _this = this;
     //设置背景，视图属性，创建覆盖层基本属性
 
     setBaseQWidget();
@@ -40,11 +42,8 @@ void BackgroundWidget::setBaseQWidget()
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setRenderHint(QPainter::Antialiasing);        // 抗锯齿
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // 避免残影
-
-    // 3. 创建透明覆盖层（一个空的 QGraphicsWidget）
-    m_overlay->setZValue(Layer::LAYER_PLAYER_3);                     // 确保覆盖层在最上面
-    m_overlay->setGeometry(QRectF(0, 0, width(), height()));
-    m_scene->addItem(m_overlay.get());
+    setRenderHint(QPainter::SmoothPixmapTransform); // 平滑缩放
+    setAlignment(Qt::AlignCenter);
 
     // 4. 设置背景色（默认黑色）
     setBackgroundBrush(Qt::black);
@@ -55,20 +54,20 @@ void BackgroundWidget::setPlayer()
     // 初始化两个播放器
     m_player_1->setPlayer(Layer::LAYER_PLAYER_2);
     m_player_2->setPlayer(Layer::LAYER_PLAYER_1);
-    
+
     // 将两个播放器的图形项添加到场景
     m_scene->addItem(m_player_1->getPixmapItem());
     m_scene->addItem(m_player_1->getVideoItem());
     m_scene->addItem(m_player_2->getPixmapItem());
     m_scene->addItem(m_player_2->getVideoItem());
-    
+
     // 初始时隐藏所有播放器
     m_player_1->hidePlayer(PlayerType::NONPLAYER);
     m_player_2->hidePlayer(PlayerType::NONPLAYER);
-    
+
     // 调整视频项大小以填充视图
     auto setupVideoItem = [this](Player* player) {
-        connect(player->getMediaPlayer(), &QMediaPlayer::mediaStatusChanged, this, 
+        connect(player->getMediaPlayer(), &QMediaPlayer::mediaStatusChanged, this,
                 [this, player](QMediaPlayer::MediaStatus status) {
                     if (status == QMediaPlayer::LoadedMedia || status == QMediaPlayer::BufferedMedia) {
                         auto videoItem = player->getVideoItem();
@@ -79,10 +78,11 @@ void BackgroundWidget::setPlayer()
                             // 然后设置目标矩形仍为视图大小
                             videoItem->setSize(size());
                         }
+
                     }
                 });
     };
-    
+
     setupVideoItem(m_player_1.get());
     setupVideoItem(m_player_2.get());
 }
@@ -124,7 +124,7 @@ void BackgroundWidget::setBackground(const QString &filePath1,Player * player,bo
 {
     QFileInfo info(filePath1);
     QString suffix = info.suffix().toLower();
-        
+
     //判断是否为后台加载
     if(!isplayer)
     {
@@ -132,26 +132,28 @@ void BackgroundWidget::setBackground(const QString &filePath1,Player * player,bo
     }
     // 根据文件类型设置播放器
     if (suffix == "png" || suffix == "jpg" || suffix == "jpeg") {
+        player->setupPixmap(filePath1);
         if(isplayer){player->showPlayer(PlayerType::PIXMAP);}
         else {ptype = PlayerType::PIXMAP;}
-        player->setupPixmap(filePath1);
     } else if (suffix == "gif") {
+        player->setupMovie(filePath1);
         if(isplayer){player->showPlayer(PlayerType::MOVIE);}
         else {ptype = PlayerType::MOVIE;}
-        player->setupMovie(filePath1);
     } else if (suffix == "mp4") {
+        player->setupVideo(filePath1);
         if(isplayer){player->showPlayer(PlayerType::VIDEO);}
         else {ptype = PlayerType::VIDEO;}
-        player->setupVideo(filePath1);
     } else {
         return;
     }
-    // 调整覆盖层大小以适应新背景
-    if (m_overlay)
-        m_overlay->setGeometry(QRectF(0, 0, width(), height()));
-
-    // 确保覆盖层在最上层（Z序）
-    m_overlay->setZValue(10);
+    //调整覆盖层大小
+    if (!m_overlay.isEmpty()) {
+        for(auto overlay : m_overlay)
+        {
+            overlay->setGeometry(QRectF(0, 0, width(), height()));
+            overlay->setZValue(Layer::LAYER_PLAYER_3);
+        }
+    }
 }
 
 
@@ -160,27 +162,47 @@ const QString &BackgroundWidget::getFile() const
     return m_currentFile;
 }
 
-QGraphicsWidget* BackgroundWidget::getOvrlay() const
+const QHash<QString,Overlay*>& BackgroundWidget::getOvrlay()
 {
-    return m_overlay.get();
+    return _this->m_overlay;
+}
+
+QGraphicsScene *BackgroundWidget::getScene() const
+{
+    return m_scene.get();
+}
+
+void BackgroundWidget::addOvrlay(const std::pair<QString, Overlay *> &overlay)
+{
+    auto _overlay = overlay.second;
+    double LAYER_PALYER = Layer::LAYER_PLAYER_3 + m_overlay.size();
+    // 3. 创建透明覆盖层（一个空的 QGraphicsWidget）
+    _overlay->setZValue(LAYER_PALYER);                     // 确保覆盖层在最上面
+    _overlay->setGeometry(QRectF(0, 0,width(), height()));
+    m_scene->addItem(_overlay);
+    m_overlay.insert(overlay.first, overlay.second);
 }
 
 void BackgroundWidget::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
+    qDebug() << "resizeEvent" <<size();
     if (m_scene) {
         // 调整场景大小
         m_scene->setSceneRect(0, 0, width(), height());
-        
-        // 调整覆盖层大小
-        if (m_overlay) {
-            m_overlay->setGeometry(QRectF(0, 0, width(), height()));
+
+        //调整覆盖层大小
+        if (!m_overlay.isEmpty()) {
+            for(auto overlay : m_overlay)
+            {
+                overlay->setGeometry(QRectF(0, 0, width(), height()));
+            }
         }
-        
+
         // 调整两个播放器的视频项和图片项大小
         auto adjustPlayer = [this](Player* player) {
             if (!player) return;
-            
+
             // 调整视频项大小
             auto videoItem = player->getVideoItem();
             if (videoItem) {
@@ -189,7 +211,7 @@ void BackgroundWidget::resizeEvent(QResizeEvent *event)
                 // 然后设置目标矩形仍为视图大小
                 videoItem->setSize(size());
             }
-            
+
             // 调整图片项大小
             auto pixmapItem = player->getPixmapItem();
             if (pixmapItem) {
@@ -199,7 +221,7 @@ void BackgroundWidget::resizeEvent(QResizeEvent *event)
                 }
             }
         };
-        
+
         adjustPlayer(m_player_1.get());
         adjustPlayer(m_player_2.get());
     }

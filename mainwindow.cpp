@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "WallpaperLoad.h"
 #include "backgroundwidget.h"
+#include "Overlay.h"
+#include "desktop.h"
 #include <QStatusBar>
 #include <QCoreApplication>
 #include <QDir>
@@ -12,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , wallpaper(new WallpaperLoad(this))
 {
-    qDebug() << "MainWindow"<<size();
     // 获取Wallpaper目录路径
     path = getWallpaperPath();
     
@@ -22,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     setMainWindow();
     //设置壁纸
     setWallpaper();
+
+    //添加窗口界面
+    addOverlay();
 }
 
 QString MainWindow::getWallpaperPath()
@@ -53,7 +57,7 @@ void MainWindow::setMainWindow()
     //设置标题样式
     // 使用 '|' 组合多个标志
     // setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    QIcon icon(":/Wallpaper/5.jpg");
+    QIcon icon(":/Resource/5.jpg");
     setWindowIcon(icon);
     setWindowTitle("车载音乐");
 
@@ -81,4 +85,13 @@ void MainWindow::switchWallpaper()
 void MainWindow::setTime()
 {
     // 时间设置逻辑
+}
+
+void MainWindow::addOverlay()
+{
+    auto desktopOverlay = new Overlay();
+    //桌面控制
+    wallpaper->getBackgroundWidget()->addOvrlay({"desktop",desktopOverlay});
+    auto Desktop = new desktop();
+    BackgroundWidget::getOvrlay()["desktop"]->addWidget(Desktop);
 }

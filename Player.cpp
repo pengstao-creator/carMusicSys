@@ -29,14 +29,14 @@ void Player::setPlayer(const qreal z = Layer::LAYER_PLAYER_1)
 {
     m_pixmapItem->setZValue(z);          // 底层
     m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
-    
+
     // 设置视频输出到该图形项
     m_videoItem->setZValue(z);
     m_mediaPlayer->setAudioOutput(m_audioOutput.get());    // Qt6 方式连接音频
     m_mediaPlayer->setVideoOutput(m_videoItem.get());
 
     // 循环播放
-    connect(m_mediaPlayer.get(), &QMediaPlayer::mediaStatusChanged, this, 
+    connect(m_mediaPlayer.get(), &QMediaPlayer::mediaStatusChanged, this,
             [this](QMediaPlayer::MediaStatus status) {
                 if (status == QMediaPlayer::EndOfMedia)
                     m_mediaPlayer->play();
@@ -60,6 +60,7 @@ bool Player::hidePlayer(PlayerType type)
     {
         m_mediaPlayer->stop();//清除视频资源，黑屏显示，播放位置重置为0
         m_videoItem->setVisible(false);//设置隐藏
+
     }
     else if(type == PlayerType::PIXMAP || type == PlayerType::MOVIE)
     {
@@ -139,7 +140,6 @@ void Player::setupMovie(const QString &path)
 void Player::setupVideo(const QString &path)
 {
     m_mediaPlayer->setSource(QUrl::fromLocalFile(path));
-    m_mediaPlayer->play();
 }
 
 void Player::setVideoSize(const QSize &size)

@@ -2,11 +2,6 @@
 #define OVERLAY_H
 
 #include <QGraphicsProxyWidget>
-
-namespace Ui {
-class Overlay;
-}
-
 class Overlay : public QGraphicsProxyWidget
 {
     Q_OBJECT
@@ -14,9 +9,8 @@ class Overlay : public QGraphicsProxyWidget
 public:
     explicit Overlay(QGraphicsItem *parent = nullptr);
     ~Overlay();
-
+    void addWidget(QWidget * overlyD);
 private:
-    Ui::Overlay *ui;
 };
 
 #endif // OVERLAY_H
