@@ -18,7 +18,10 @@ public:
     // 设置背景文件（支持 .png .jpg .gif .mp4）
     void setPath(const QString &filePath);
     void setPathFirst(const QString &filePath1,const QString &filePath2);
+    void stop();
+    void play();
     const QString &getFile() const;
+
 protected:
     void resizeEvent() ;
 private:

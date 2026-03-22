@@ -17,7 +17,9 @@ void softwareControl::openSoft(const QString &softName)
 void softwareControl::openWeather()
 {
     auto weatherApp = new weather();
+    weatherApp->getweatherForCity("成都");
+
     zAxisCtrl->addOverlay("weather",weatherApp);
     auto wetherWidget = zAxisCtrl->getOvrlay();
-    qDebug() << "openWeather";
+
 }

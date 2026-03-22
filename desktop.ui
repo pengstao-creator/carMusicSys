@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-image: url(:/Resource/2.png);</string>
+    <string notr="true">border-image: url(:/Resource/app/2.png);</string>
    </property>
    <property name="text">
     <string/>
@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-image: url(:/Resource/4.png);</string>
+    <string notr="true">border-image: url(:/Resource/app/4.png);</string>
    </property>
    <property name="text">
     <string/>
@@ -55,7 +55,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-image: url(:/Resource/3.png);</string>
+    <string notr="true">border-image: url(:/Resource/app/3.png);</string>
    </property>
    <property name="text">
     <string/>
@@ -71,7 +71,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-image: url(:/Resource/6.png);
+    <string notr="true">border-image: url(:/Resource/app/6.png);
 </string>
    </property>
    <property name="text">

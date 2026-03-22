@@ -60,7 +60,7 @@ void MainWindow::setMainWindow()
     //设置标题样式
     // 使用 '|' 组合多个标志
     // setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    QIcon icon(":/Resource/5.jpg");
+    QIcon icon(":/Resource/app/5.jpg");
     setWindowIcon(icon);
     setWindowTitle("车载音乐");
 

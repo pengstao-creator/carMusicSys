@@ -44,6 +44,18 @@ void WallpaperLoad::setPath(const QString &path)
     }
 }
 
+void WallpaperLoad::stop()
+{
+    _switchTime->stop();
+    _wallpaper->stop();
+}
+
+void WallpaperLoad::start()
+{
+    _switchTime->start(_stime);
+    _wallpaper->play();
+}
+
 void WallpaperLoad::switchWallpaper()
 {
     if(_wallpaper && !_wallpapers.isEmpty())

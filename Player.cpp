@@ -55,6 +55,24 @@ void Player::setPlayer(const qreal z = Layer::LAYER_PLAYER_1)
     hidePlayer(PlayerType::NONPLAYER);
 }
 
+void Player::pause()
+{
+    if(m_mediaPlayer)return;
+    m_mediaPlayer->pause();
+}
+
+void Player::stop()
+{
+    if(m_mediaPlayer)return;
+    m_mediaPlayer->stop();
+}
+
+void Player::play()
+{
+    if(m_mediaPlayer)return;
+    m_mediaPlayer->play();
+}
+
 bool Player::hidePlayer(PlayerType type)
 {
     if(type == PlayerType::VIDEO)

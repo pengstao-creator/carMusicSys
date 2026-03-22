@@ -28,6 +28,9 @@ public:
     void setupMovie(const QString &path);    // GIF
     void setupVideo(const QString &path);    // MP4
     void setPlayer(const qreal z);
+    void pause();
+    void stop();
+    void play();
     bool switchPlayer(PlayerType); 
     bool hidePlayer(PlayerType); 
     bool showPlayer(PlayerType);

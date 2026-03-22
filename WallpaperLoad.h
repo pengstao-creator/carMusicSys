@@ -15,7 +15,8 @@ public:
     void setwallpaerWidget(wallpaerWidget *widget);
     void setPath(const QString &path);
     wallpaerWidget* getwallpaerWidget() const;
-
+    void stop();
+    void start();
 private slots:
     void switchWallpaper();
 

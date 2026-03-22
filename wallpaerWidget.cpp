@@ -77,6 +77,30 @@ void wallpaerWidget::setPathFirst(const QString &filePath1, const QString &fileP
     m_currentFile = info.fileName();
 }
 
+void wallpaerWidget::stop()
+{
+    if(is_player_1)
+    {
+        m_player_1->pause();
+    }
+    else
+    {
+        m_player_2->pause();
+    }
+}
+
+
+void wallpaerWidget::play()
+{
+    if(is_player_1)
+    {
+        m_player_1->play();
+    }
+    else
+    {
+        m_player_2->play();
+    }
+}
 
 void wallpaerWidget::setPath(const QString &filePath)
 {
