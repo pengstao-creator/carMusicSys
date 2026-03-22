@@ -7,8 +7,9 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
+class zAxisControl;
 class WallpaperLoad;
+class Overlay;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -27,12 +28,14 @@ private:
     void setWallpaper();
     void switchWallpaper();
     void setTime();
-    void addOverlay();
+    void addWdiget();
+    void addOverlay(const QString& name,QWidget * widget);
     QString getWallpaperPath();
 private:
     Ui::MainWindow *ui;
     QString path ;
-    std::unique_ptr<WallpaperLoad> wallpaper;
+    WallpaperLoad * wallpaper;
+    zAxisControl * zAxisCtrl;
 
 };
 

@@ -9,6 +9,7 @@
 #include <QAudioOutput>
 #include <QSize>
 
+
 Player::Player(QObject *parent)
     : QObject(parent)
     , m_pixmapItem(std::make_unique<QGraphicsPixmapItem>())

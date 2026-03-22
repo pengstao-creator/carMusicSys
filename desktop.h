@@ -6,7 +6,7 @@
 namespace Ui {
 class desktop;
 }
-class BackgroundWidget;
+class wallpaerWidget;
 class QLabel;
 class desktop : public QWidget
 {

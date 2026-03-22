@@ -1,9 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "WallpaperLoad.h"
-#include "backgroundwidget.h"
+#include "wallpaerWidget.h"
 #include "Overlay.h"
 #include "desktop.h"
+#include "weather.h"
+#include "zaxiscontrol.h"
 #include <QStatusBar>
 #include <QCoreApplication>
 #include <QDir>
@@ -13,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , wallpaper(new WallpaperLoad(this))
+    , zAxisCtrl(new zAxisControl(this))
 {
     // 获取Wallpaper目录路径
     path = getWallpaperPath();
@@ -25,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWallpaper();
 
     //添加窗口界面
-    addOverlay();
+    addWdiget();
 }
 
 QString MainWindow::getWallpaperPath()
@@ -51,7 +54,7 @@ MainWindow::~MainWindow()
 void MainWindow::setMainWindow()
 {
     //固定窗口大小不能拖动更改
-    setFixedSize(QSize(800,400));
+    // setFixedSize(QSize(800,400));
     // 隐藏状态栏
     statusBar()->hide();
     //设置标题样式
@@ -69,10 +72,13 @@ void MainWindow::setMainWindow()
 
 void MainWindow::setWallpaper()
 {
-    wallpaper->setBackgroundWidget(new BackgroundWidget(this));
-    // 获取BackgroundWidget的原始指针并设置为中央部件
-    auto bgWidget = wallpaper->getBackgroundWidget();
-    setCentralWidget(bgWidget);
+    // 先设置zAxisCtrl为中央部件，这样它的大小会被调整为窗口大小
+    //zAxisCtrl是QGraphicsView的子对象
+    setCentralWidget(zAxisCtrl);
+    qDebug() << "MainWindow"<<size() << "zAxisCtrl" << zAxisCtrl->getQRect();
+    // 然后再创建wallpaerWidget，这样它就会使用正确的大小
+    wallpaper->setwallpaerWidget(new wallpaerWidget(zAxisCtrl, this));
+
     // 启动壁纸切换
     wallpaper->setPath(path);
 }
@@ -87,11 +93,18 @@ void MainWindow::setTime()
     // 时间设置逻辑
 }
 
-void MainWindow::addOverlay()
+void MainWindow::addWdiget()
 {
-    auto desktopOverlay = new Overlay();
-    //桌面控制
-    wallpaper->getBackgroundWidget()->addOvrlay({"desktop",desktopOverlay});
-    auto Desktop = new desktop();
-    BackgroundWidget::getOvrlay()["desktop"]->addWidget(Desktop);
+    //桌面控制,只负责app布局
+    addOverlay("desktop",new desktop);
+    //添加
+    addOverlay("weather",new weather);
+
+}
+
+void MainWindow::addOverlay(const QString &name,QWidget *widget)
+{
+    zAxisCtrl->addOvrlay({name,new Overlay});
+    //设置代理项
+    zAxisCtrl->getOvrlay()[name]->addWidget(widget);
 }

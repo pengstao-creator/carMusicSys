@@ -36,14 +36,11 @@ void desktop::resizeEvent(QResizeEvent *event)
         //计算缩放比例
         double wideRatio = (double)size().width() / baseSize().width();
         double highRatio = (double)size().height()/ baseSize().height();
-        qDebug() << "wideRatio  " << wideRatio << " highRatio  " << highRatio;
         //从新设置容器大小,按照初始位置进行缩放
         int  newx = 280 * wideRatio;
         int newy= 30 * highRatio;
         int neww = 200 * wideRatio;
         int newh = 150 * highRatio;
-        qDebug() << size() << "----" << timecontainer->pos();
-        qDebug() <<newx << "----" <<newy << "----" << neww << "-----" << newh;
         timecontainer->setGeometry(newx,newy,neww,newh);
     }
 

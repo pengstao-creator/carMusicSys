@@ -27,21 +27,23 @@ SOURCES += \
     desktop.cpp \
     main.cpp \
     mainwindow.cpp \
-    backgroundwidget.cpp \
     Overlay.cpp \
     Player.cpp \
     WallpaperLoad.cpp \
-    weather.cpp
+    wallpaerWidget.cpp \
+    weather.cpp \
+    zaxiscontrol.cpp
 
 HEADERS += \
     Data.h \
     desktop.h \
     mainwindow.h \
-    backgroundwidget.h \
     Overlay.h \
     Player.h \
     WallpaperLoad.h \
-    weather.h
+    wallpaerWidget.h \
+    weather.h \
+    zaxiscontrol.h
 
 FORMS += \
     desktop.ui \
