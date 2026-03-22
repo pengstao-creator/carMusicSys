@@ -1,5 +1,7 @@
 #include "desktop.h"
 #include "ui_desktop.h"
+#include "zaxiscontrol.h"
+#include "softwarecontrol.h"
 #include <QTime>
 #include <QDate>
 #include <QLocale>
@@ -8,11 +10,14 @@
 #include <QMouseEvent>
 #include <QGraphicsBlurEffect>
 #include <QLabel>
-desktop::desktop(QWidget *parent)
+desktop::desktop(zAxisControl * zAxis_Ctrl,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::desktop)
     , timeclock(new QTimer(this))
     , timecontainer(new QWidget(this))
+    , zAxisCtrl(zAxis_Ctrl)
+    , softCtrl(new softwareControl(zAxisCtrl,this))
+
 {
     ui->setupUi(this);
     timecontainer->setGeometry(280,30,200,150);
@@ -49,16 +54,16 @@ void desktop::resizeEvent(QResizeEvent *event)
 
 
 
-void desktop::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
+// void desktop::mousePressEvent(QMouseEvent *event)
+// {
+//     if (event->button() == Qt::LeftButton) {
 
-    } else if (event->button() == Qt::RightButton) {
-        qDebug() << "右键按下，位置：" << event->pos();
-    }
-    // 调用基类，以便事件继续传递（如果需要）
-    // QWidget::mousePressEvent(event);
-}
+//     } else if (event->button() == Qt::RightButton) {
+//         qDebug() << "右键按下，位置：" << event->pos();
+//     }
+//     // 调用基类，以便事件继续传递（如果需要）
+//     QWidget::mousePressEvent(event);
+// }
 
 void desktop::windowDesign()
 {
@@ -124,24 +129,29 @@ void desktop::getTime(QLabel* ymd, QLabel* hms)
 
 void desktop::on_weather_clicked()
 {
-
+    openSoft("weather");
 }
 
 
 void desktop::on_QQMusic_clicked()
 {
-
+    openSoft("QQMusic");
 }
 
 
 void desktop::on_amap_clicked()
 {
-
+    openSoft("amap");
 }
 
 
 void desktop::on_bilibili_clicked()
 {
+    openSoft("bilibili");
+}
 
+void desktop::openSoft(const QString &softName)
+{
+    softCtrl->openSoft(softName);
 }
 

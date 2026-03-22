@@ -16,6 +16,7 @@ public:
     ~zAxisControl();
     const QHash<QString,Overlay*>& getOvrlay() const;
     QGraphicsScene * getScene()const;
+    void addOverlay(const QString &name,QWidget *widget);
     void addOvrlay(const std::pair<QString,Overlay*>& overlay);
     const QRectF& getQRect() const;
 protected:

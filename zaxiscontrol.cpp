@@ -26,6 +26,12 @@ QGraphicsScene *zAxisControl::getScene() const
     return m_scene;
 }
 
+void zAxisControl::addOverlay(const QString &name, QWidget *widget)
+{
+    addOvrlay({name,new Overlay});
+    m_overlay[name]->addWidget(widget);
+}
+
 void zAxisControl::addOvrlay(const std::pair<QString, Overlay *> &overlay)
 {
     auto _overlay = overlay.second;

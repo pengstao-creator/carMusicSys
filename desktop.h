@@ -8,17 +8,19 @@ class desktop;
 }
 class wallpaerWidget;
 class QLabel;
+class zAxisControl;
+class softwareControl;
 class desktop : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit desktop(QWidget *parent = nullptr);
+    explicit desktop(zAxisControl * zAxis_Ctrl,QWidget *parent = nullptr);
     ~desktop();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
+    // void mousePressEvent(QMouseEvent *event) override;
 private slots:
     void on_weather_clicked();
 
@@ -29,6 +31,7 @@ private slots:
     void on_bilibili_clicked();
 
 private:
+    void openSoft(const QString& softName);
     void windowDesign();
     void setTime();
     void getTime(QLabel* ymd, QLabel* hms);
@@ -36,6 +39,9 @@ private:
     Ui::desktop *ui;
     QTimer * timeclock;
     QWidget * timecontainer;
+    zAxisControl * zAxisCtrl;
+    softwareControl * softCtrl;
+
 
 };
 

@@ -1,13 +1,13 @@
 #ifndef WEATHER_H
 #define WEATHER_H
 
-#include <QWidget>
+#include <QDockWidget>
 
 namespace Ui {
 class weather;
 }
 
-class weather : public QWidget
+class weather : public QDockWidget
 {
     Q_OBJECT
 

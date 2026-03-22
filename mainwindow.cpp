@@ -96,15 +96,5 @@ void MainWindow::setTime()
 void MainWindow::addWdiget()
 {
     //桌面控制,只负责app布局
-    addOverlay("desktop",new desktop);
-    //添加
-    addOverlay("weather",new weather);
-
-}
-
-void MainWindow::addOverlay(const QString &name,QWidget *widget)
-{
-    zAxisCtrl->addOvrlay({name,new Overlay});
-    //设置代理项
-    zAxisCtrl->getOvrlay()[name]->addWidget(widget);
+    zAxisCtrl->addOverlay("desktop",new desktop(zAxisCtrl));
 }

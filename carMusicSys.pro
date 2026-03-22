@@ -30,6 +30,7 @@ SOURCES += \
     Overlay.cpp \
     Player.cpp \
     WallpaperLoad.cpp \
+    softwarecontrol.cpp \
     wallpaerWidget.cpp \
     weather.cpp \
     zaxiscontrol.cpp
@@ -41,6 +42,7 @@ HEADERS += \
     Overlay.h \
     Player.h \
     WallpaperLoad.h \
+    softwarecontrol.h \
     wallpaerWidget.h \
     weather.h \
     zaxiscontrol.h
