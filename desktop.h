@@ -7,6 +7,7 @@ namespace Ui {
 class desktop;
 }
 class BackgroundWidget;
+class QLabel;
 class desktop : public QWidget
 {
     Q_OBJECT
@@ -18,13 +19,24 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+private slots:
+    void on_weather_clicked();
+
+    void on_QQMusic_clicked();
+
+    void on_amap_clicked();
+
+    void on_bilibili_clicked();
+
 private:
     void windowDesign();
     void setTime();
-    void getTime();
+    void getTime(QLabel* ymd, QLabel* hms);
 
     Ui::desktop *ui;
     QTimer * timeclock;
+    QWidget * timecontainer;
+
 };
 
 #endif // DESKTOP_H

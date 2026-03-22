@@ -30,7 +30,8 @@ SOURCES += \
     backgroundwidget.cpp \
     Overlay.cpp \
     Player.cpp \
-    WallpaperLoad.cpp
+    WallpaperLoad.cpp \
+    weather.cpp
 
 HEADERS += \
     Data.h \
@@ -39,11 +40,13 @@ HEADERS += \
     backgroundwidget.h \
     Overlay.h \
     Player.h \
-    WallpaperLoad.h
+    WallpaperLoad.h \
+    weather.h
 
 FORMS += \
     desktop.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    weather.ui
 RESOURCES += \
     resource.qrc
 

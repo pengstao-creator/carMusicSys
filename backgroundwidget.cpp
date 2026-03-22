@@ -100,7 +100,7 @@ void BackgroundWidget::setPathFirst(const QString &filePath1, const QString &fil
     // 设置当前文件名为第二个文件的文件名
     QFileInfo info(filePath2);
     m_currentFile = info.fileName();
-    qDebug() << "m_player_1"<<filePath1;
+;
 }
 
 
@@ -109,7 +109,6 @@ void BackgroundWidget::setPath(const QString &filePath)
     if(is_player_1)
     {
         m_player_2->showPlayer(ptype);
-        qDebug() << "m_player_2"<<filePath;
 
         setBackground(filePath,m_player_1.get());
         m_player_1->hidePlayer(PlayerType::NONPLAYER);
@@ -118,7 +117,6 @@ void BackgroundWidget::setPath(const QString &filePath)
     else
     {
         m_player_1->showPlayer(ptype);
-        qDebug() << "m_player_1"<<filePath;
 
         setBackground(filePath,m_player_2.get());
         m_player_2->hidePlayer(PlayerType::NONPLAYER);
@@ -148,14 +146,8 @@ void BackgroundWidget::setBackground(const QString &filePath1,Player * player)
     } else {
         return;
     }
-    //调整覆盖层大小
-    if (!m_overlay.isEmpty()) {
-        for(auto overlay : m_overlay)
-        {
-            overlay->setGeometry(QRectF(0, 0, width(), height()));
-            overlay->setZValue(Layer::LAYER_PLAYER_3);
-        }
-    }
+
+    resizeEvent(nullptr);
 }
 
 

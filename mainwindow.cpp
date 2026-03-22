@@ -51,7 +51,7 @@ MainWindow::~MainWindow()
 void MainWindow::setMainWindow()
 {
     //固定窗口大小不能拖动更改
-    // setFixedSize(QSize(800,460));
+    setFixedSize(QSize(800,400));
     // 隐藏状态栏
     statusBar()->hide();
     //设置标题样式
