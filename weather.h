@@ -2,11 +2,14 @@
 #define weather_H
 
 #include <QWidget>
+#include "CacheManager.hpp"
+#include <QString>
 class QNetworkAccessManager;
 class QNetworkReply;
 class QJsonDocument;
 class QJsonObject;
 class QJsonArray;
+
 namespace Ui {
 class weather;
 }
@@ -29,9 +32,11 @@ private slots:
 private:
     void parseweatherJson(const QByteArray &jsonData); // 解析JSON数据
     void testNetworkConnection(); // 测试网络连接
+    class WeatherData;
 
     Ui::weather *ui;
     QNetworkAccessManager *manager;
+    CacheManager<WeatherData> * cacheData;
 };
 
 #endif // weather_H

@@ -19,6 +19,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # Input
 HEADERS += Data.h \
+           CacheManager.hpp \
            desktop.h \
            mainwindow.h \
            Overlay.h \

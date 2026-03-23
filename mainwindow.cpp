@@ -2,9 +2,7 @@
 #include "ui_mainwindow.h"
 #include "WallpaperLoad.h"
 #include "wallpaerWidget.h"
-#include "Overlay.h"
 #include "desktop.h"
-#include "weather.h"
 #include "zaxiscontrol.h"
 #include <QStatusBar>
 #include <QCoreApplication>
