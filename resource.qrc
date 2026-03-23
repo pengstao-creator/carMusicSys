@@ -513,5 +513,6 @@
         <file>Resource/weatherIcons/9999.svg</file>
         <file>Resource/weatherIcons/qweather.svg</file>
         <file>Resource/weatherIcons/qweather-fill.svg</file>
+        <file>Resource/app/7.png</file>
     </qresource>
 </RCC>

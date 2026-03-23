@@ -15,6 +15,7 @@ Player::Player(QObject *parent)
     , m_pixmapItem(std::make_unique<QGraphicsPixmapItem>())
     , m_videoItem(std::make_unique<QGraphicsVideoItem>())
     , m_movie(std::make_unique<QMovie>())
+    , m_MovieItem(std::make_unique<QGraphicsPixmapItem>())
     , m_mediaPlayer(std::make_unique<QMediaPlayer>())
     , m_audioOutput(std::make_unique<QAudioOutput>())
     , ptype(PlayerType::NONPLAYER)
@@ -26,11 +27,26 @@ Player::~Player()
     // 智能指针会自动管理内存，不需要手动释放
 }
 
-void Player::setPlayer(const qreal z = Layer::LAYER_PLAYER_1)
+void Player::setWallpaperPlayer(const qreal z = Layer::LAYER_PLAYER_1)
+{
+    setPixmapPlayer(z);
+    setVideoPlayer(z);
+
+
+
+    // 初始隐藏所有播放器
+    hidePlayer(PlayerType::NONPLAYER);
+}
+
+void Player::setPixmapPlayer(const qreal z)
 {
     m_pixmapItem->setZValue(z);          // 底层
     m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
 
+}
+
+void Player::setVideoPlayer(const qreal z)
+{
     // 设置视频输出到该图形项
     m_videoItem->setZValue(z);
     m_mediaPlayer->setAudioOutput(m_audioOutput.get());    // Qt6 方式连接音频
@@ -43,6 +59,11 @@ void Player::setPlayer(const qreal z = Layer::LAYER_PLAYER_1)
                     m_mediaPlayer->play();
             });
 
+}
+
+void Player::setMoviePlayer(const qreal z)
+{
+    m_MovieItem->setZValue(z);
     // 连接帧更新信号
     connect(m_movie.get(), &QMovie::frameChanged, this, [this](int /*frame*/) {
         if (m_pixmapItem) {
@@ -50,9 +71,6 @@ void Player::setPlayer(const qreal z = Layer::LAYER_PLAYER_1)
             m_pixmapItem->setPixmap(pix);
         }
     });
-
-    // 初始隐藏所有播放器
-    hidePlayer(PlayerType::NONPLAYER);
 }
 
 void Player::pause()
@@ -63,13 +81,13 @@ void Player::pause()
 
 void Player::stop()
 {
-    if(m_mediaPlayer)return;
+    if(!m_mediaPlayer)return;
     m_mediaPlayer->stop();
 }
 
 void Player::play()
 {
-    if(m_mediaPlayer)return;
+    if(!m_mediaPlayer)return;
     m_mediaPlayer->play();
 }
 
@@ -81,9 +99,14 @@ bool Player::hidePlayer(PlayerType type)
         m_videoItem->setVisible(false);//设置隐藏
 
     }
-    else if(type == PlayerType::PIXMAP || type == PlayerType::MOVIE)
+    else if(type == PlayerType::PIXMAP )
     {
         m_pixmapItem->hide();
+    }
+    else if(type == PlayerType::MOVIE)
+    {
+        m_MovieItem->hide();
+        m_movie->stop();
     }
     else if(type == PlayerType::NONPLAYER)
     {
@@ -91,6 +114,8 @@ bool Player::hidePlayer(PlayerType type)
         m_mediaPlayer->pause();
         m_videoItem->setVisible(false);
         m_pixmapItem->hide();
+        m_MovieItem->hide();
+        m_movie->stop();
     }
     else
     {
@@ -106,9 +131,14 @@ bool Player::showPlayer(PlayerType type)
         m_videoItem->setVisible(true);//展示
         m_mediaPlayer->play();
     }
-    else if(type == PlayerType::PIXMAP || type == PlayerType::MOVIE)
+    else if(type == PlayerType::PIXMAP)
     {
         m_pixmapItem->show();
+    }
+    else if (type == PlayerType::MOVIE)
+    {
+        m_MovieItem->show();
+        m_movie->start();
     }
     else
     {
@@ -117,22 +147,7 @@ bool Player::showPlayer(PlayerType type)
     return true;
 }
 
-bool Player::switchPlayer(PlayerType type)
-{
-    if(type == PlayerType::NONPLAYER || type == ptype)
-    {
-        //当前类型和需要切换类型相同或者无类型不需要切换
-        return false;
-    }
 
-    //需要切换先隐藏当前播放器
-    hidePlayer(ptype);
-    //展示需要的播放器
-    showPlayer(type);
-
-    ptype = type;
-    return true;
-}
 
 void Player::setupPixmap(const QString &path)
 {

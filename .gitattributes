@@ -1,0 +1,19 @@
+# 文本文件使用 LF 行结束符
+* text=auto eol=lf
+
+# 二进制文件不转换行结束符
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.mp4 binary
+
+# 代码文件使用 LF 行结束符
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.c text eol=lf
+*.qrc text eol=lf
+*.ui text eol=lf
+*.pro text eol=lf

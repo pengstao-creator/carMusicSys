@@ -15,16 +15,53 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QLabel>
+#include <QSvgRenderer>
+#include <QLabel>
+#include <QPixmap>
+#include <QPainter>
+
+
 weather::weather(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::weather)
-    , cacheData(new CacheManager<WeatherData>(carMusicSysconfig::CACHEDATA_BASE,23))
+    , cacheData(std::make_unique<CacheManager<WeatherData>>(carMusicSysconfig::CACHEDATA_BASE,23))
+
+
 {
     ui->setupUi(this);
     manager = new QNetworkAccessManager(this);
     // 连接管理器的finished信号到我们的处理槽函数
     connect(manager, &QNetworkAccessManager::finished, this, &weather::onReplyFinished);
     connect(this,&weather::weatherDataReady,this,&weather::updateWeather);
+
+    weatherCon = QVector<QWidget*>({
+        ui->weather_1,
+        ui->weather_2,
+        ui->weather_3,
+        ui->weather_4,
+        ui->weather_5,
+        ui->weather_6,
+        ui->weather_7,
+        ui->weather_8
+    });
+
+    // 将容器背景设置为透明
+     for(auto wC : weatherCon)
+    {
+        // // 设置透明背景
+        wC->setAttribute(Qt::WA_TranslucentBackground);
+        wC->setStyleSheet("background: transparent;");
+    }
+    // 设置天气壁纸背景样式
+    // 创建主窗口
+    QString background= QString("#mainWidget {border-image: url(%1%2);}")
+                        .arg(carMusicSysconfig::WEATHER_APP_PATH)
+                        .arg(carMusicSysconfig::WEATHER_BACKGROUND);
+    qDebug() << background;
+    setObjectName("mainWidget");
+    setStyleSheet(background);
+   
+
 }
 
 weather::~weather()
@@ -47,17 +84,20 @@ public:
         root["code"] = code;
         root["updateTime"] = updateTime;
         root["daily"] = daily;
+        qDebug() << "toJson" << __FILE__;
         return QJsonDocument(root).toJson();
     }
 
     bool fromJson(const QByteArray &jsonData)
     {
+
         QJsonDocument doc = QJsonDocument::fromJson(jsonData);
         if (doc.isNull()) return false;
         QJsonObject obj = doc.object();
         code = obj.value("code").toString();
         updateTime = obj.value("updateTime").toString();
         daily = obj.value("daily").toArray();
+        qDebug() << "fromJson" << __FILE__;
         return true;
     }
 };
@@ -82,6 +122,7 @@ void weather::getweatherForCity(const QString &cityName)
     // 发送GET请求
     manager->get(request);
 }
+
 
 void weather::onReplyFinished(QNetworkReply *reply)
 {
@@ -125,16 +166,16 @@ void weather::parseweatherJson(const QByteArray &jsonData)
     }
 
     // 解析未来的数据
-    QStringList weekForecast;
+    QVector<QVector<QString>> weekForecast;
     for (int i = 0; i < dailyArray.size(); ++i) {
         QJsonObject dayObj = dailyArray[i].toObject();
-        QString amcode = dayObj.value("iconDay ").toString();
+        QString amcode = dayObj.value("iconDay").toString();
         QString amText = dayObj.value("textDay").toString();
         QString tempMax = dayObj.value("tempMax").toString();
-        QString pmcode = dayObj.value("iconNight  ").toString();
-        QString pmText = dayObj.value("textNight  ").toString();
+        QString pmcode = dayObj.value("iconNight").toString();
+        QString pmText = dayObj.value("textNight").toString();
         QString tempMin = dayObj.value("tempMin").toString();
-        QString fxDate = dayObj.value("fxDate ").toString();
+        QString fxDate = dayObj.value("fxDate").toString();
 
         // 格式化字符串,"11月16日,晴,13°,0°"
         // 这里简单使用原始日期，你可以根据需要转换格式
@@ -150,45 +191,98 @@ void weather::parseweatherJson(const QByteArray &jsonData)
     emit weatherDataReady(weekForecast);
 }
 
-void weather::updateWeather(const QStringList &weekForecast)
+void weather::updateWeather(const QVector<QVector<QString>> &weekForecast)
 {
     if(weekForecast.isEmpty())return;
-    QVector<QWidget*> weatherCon{
-        ui->weather_1,
-        ui->weather_2,
-        ui->weather_3,
-        ui->weather_4,
-        ui->weather_5,
-        ui->weather_6,
-        ui->weather_7,
-        };
 
-    int w_size = qMin(weekForecast.size() / weekForecast[0].size(),7);
+
+
+    int w_size = qMin(weekForecast.size(),7);
     for(int i =0;i <w_size;i++)
     {
-        qDebug() << w_size  << "weekForecast" << weekForecast.size();
-        // QString amcode = weekForecast[i][0];
-        // QString amText = weekForecast[i][1];
-        // QString tempMax = weekForecast[i][2];
-        // QString pmcode = weekForecast[i][3];
-        // QString pmText = weekForecast[i][4];
-        // QString tempMin = weekForecast[i][5];
-        // QString fxDate = weekForecast[i][6];
-        // QPixmap amWeather(QString("%1%2.svg").arg(amcode).arg(carMusicSysconfig::ICON_USE_FILL));
-        // QPixmap pmWeather(QString("%1%2.svg").arg(pmcode).arg(carMusicSysconfig::ICON_USE_FILL));
-        // QString am = QString("am_%1").arg(i+1);
-        // QString am_c = QString("am_c%1").arg(i+1);
-        // QString pm = QString("pm%1").arg(i+1);
-        // QString pm_c = QString("pm_c%1").arg(i+1);
-        // QString date = QString("date_%1").arg(i+1);
-        // weatherCon[i]->findChild<QLabel*>(am)->setPixmap(amWeather);
-        // weatherCon[i]->findChild<QLabel*>(am_c)->setText(amText + "," + tempMax);
-        // weatherCon[i]->findChild<QLabel*>(pm)->setPixmap(pmWeather);
-        // weatherCon[i]->findChild<QLabel*>(pm_c)->setText(pmText + "," + tempMin);
-        // weatherCon[i]->findChild<QLabel*>(date)->setText(fxDate);
+
+        QString amcode = weekForecast[i][0];
+        QString amText = weekForecast[i][1];
+        QString tempMax = weekForecast[i][2];
+        QString pmcode = weekForecast[i][3];
+        QString pmText = weekForecast[i][4];
+        QString tempMin = weekForecast[i][5];
+        QString fxDate = weekForecast[i][6];
+        QString amWeather(carMusicSysconfig::WEATHER_ICON_PATH \
+        + QString("%1%2.svg").arg(amcode).arg(carMusicSysconfig::ICON_USE_FILL));
+        QString pmWeather(carMusicSysconfig::WEATHER_ICON_PATH \
+        + QString("%1%2.svg").arg(pmcode).arg(carMusicSysconfig::ICON_USE_FILL));
+        QString am = QString("am_%1").arg(i+1);
+        QString am_c = QString("am_c_%1").arg(i+1);
+        QString pm = QString("pm_%1").arg(i+1);
+        QString pm_c = QString("pm_c_%1").arg(i+1);
+        QString date = QString("date_%1").arg(i+1);
+
+        if(auto qam = weatherCon[i]->findChild<QLabel*>(am))
+        {
+            if(cacheIcon.find(amcode.toInt()) == cacheIcon.end())
+            {
+                displaySvgOnLabel(qam,amWeather,carMusicSysconfig::LABEL_SIZE_1,amcode.toInt());
+            }
+            else
+            {
+                qam->setPixmap(cacheIcon.value(amcode.toInt()));
+            }
+        }
+
+        if(auto qam_c = weatherCon[i]->findChild<QLabel*>(am_c))
+        {
+            qam_c->setText(amText + "," + tempMax);
+        }
+        if(auto qpm = weatherCon[i]->findChild<QLabel*>(pm))
+        {
+            if(cacheIcon.find(pmcode.toInt()) == cacheIcon.end())
+            {
+                displaySvgOnLabel(qpm,pmWeather,carMusicSysconfig::LABEL_SIZE_1,pmcode.toInt());
+            }
+            else
+            {
+                qpm->setPixmap(cacheIcon.value(pmcode.toInt()));
+            }
+        }
+        if(auto qpm_c = weatherCon[i]->findChild<QLabel*>(pm_c))
+        {
+            qpm_c->setText(pmText + "," + tempMin);
+        }
+        if(auto qdate = weatherCon[i]->findChild<QLabel*>(date))
+        {
+            qdate->setText(fxDate);
+        }
+        // weatherCon[i]->setStyleSheet("background-color: rgb(167, 240, 255);");
     }
 
 }
 
+void weather::displaySvgOnLabel(QLabel *label, const QString &svgPath, int size,int iconcode)
+{
+    QSvgRenderer renderer(svgPath);
+    QPixmap pixmap(size, size);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);      // 抗锯齿
+    painter.setRenderHint(QPainter::SmoothPixmapTransform); // 平滑变换
+    renderer.render(&painter);
+    label->setPixmap(pixmap);
+    label->setFixedSize(size, size);
+    if(cacheIcon.size() < carMusicSysconfig::CACHELIMIT)
+    {
+        cacheIcon.insert(iconcode,pixmap);
+    }
+}
 
+
+
+void weather::on_exit_clicked()
+{
+    //暂时隐藏窗口
+    close();
+    //手动释放
+    emit exit();
+
+}
 

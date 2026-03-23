@@ -16,9 +16,14 @@ public:
     ~zAxisControl();
     const QHash<QString,Overlay*>& getOvrlay() const;
     QGraphicsScene * getScene()const;
-    void addOverlay(const QString &name,QWidget *widget);
+    void addOverlay(const QString &name,QWidget *widget,bool is_transparent = false);
     void addOvrlay(const std::pair<QString,Overlay*>& overlay);
-    const QRectF& getQRect() const;
+    void erase(const QString& name);
+    QRectF&& getQRect() const;
+
+signals:
+    void wallpaperStop();
+    void wallpaperStart();
 protected:
     void resizeEvent(QResizeEvent *event) override;
 private:

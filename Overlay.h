@@ -9,7 +9,7 @@ class Overlay : public QGraphicsProxyWidget
 public:
     explicit Overlay(QGraphicsItem *parent = nullptr);
     ~Overlay();
-    void addWidget(QWidget * overlyD);
+    void addWidget(QWidget * overlyD,bool is_transparent = false);
 private:
 };
 

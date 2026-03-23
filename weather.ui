@@ -34,17 +34,20 @@
    </property>
    <item>
     <widget class="QWidget" name="weather_1" native="true">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <widget class="QLabel" name="am_1">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>100</y>
         <width>100</width>
         <height>100</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-image: url(:/Resource/weather/dayu.png);</string>
+       <string notr="true">background-color: rgb(165, 255, 191);</string>
       </property>
       <property name="text">
        <string/>
@@ -54,13 +57,13 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>250</y>
         <width>100</width>
         <height>100</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-image: url(:/Resource/weather/dayu.png);</string>
+       <string notr="true">background-color: rgb(190, 213, 255);</string>
       </property>
       <property name="text">
        <string/>
@@ -70,10 +73,13 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>100</width>
         <height>50</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(212, 176, 255);</string>
       </property>
       <property name="text">
        <string/>
@@ -83,10 +89,13 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>300</y>
+        <y>350</y>
         <width>100</width>
         <height>50</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(222, 255, 187);</string>
       </property>
       <property name="text">
        <string/>
@@ -96,10 +105,13 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>50</y>
         <width>100</width>
         <height>50</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 222, 175);</string>
       </property>
       <property name="text">
        <string/>
@@ -113,7 +125,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>100</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -129,7 +141,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>250</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -145,7 +157,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -158,7 +170,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>300</y>
+        <y>350</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -171,7 +183,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>50</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -188,7 +200,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>100</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -204,7 +216,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>250</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -220,10 +232,13 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>100</width>
         <height>50</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <property name="text">
        <string/>
@@ -233,7 +248,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>300</y>
+        <y>350</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -246,7 +261,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>50</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -263,7 +278,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>100</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -279,7 +294,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>250</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -295,7 +310,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -308,7 +323,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>300</y>
+        <y>350</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -321,7 +336,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>50</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -338,7 +353,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>100</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -354,7 +369,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>250</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -370,7 +385,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -383,7 +398,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>300</y>
+        <y>350</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -396,7 +411,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>50</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -413,7 +428,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>100</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -429,7 +444,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>250</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -445,7 +460,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -458,7 +473,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>300</y>
+        <y>350</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -471,7 +486,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>50</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -488,7 +503,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>100</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -504,7 +519,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>250</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -520,7 +535,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -533,7 +548,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>300</y>
+        <y>350</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -546,7 +561,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>50</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -563,7 +578,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>100</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -579,7 +594,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
+        <y>250</y>
         <width>100</width>
         <height>100</height>
        </rect>
@@ -595,7 +610,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -608,7 +623,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>300</y>
+        <y>350</y>
         <width>100</width>
         <height>50</height>
        </rect>
@@ -621,13 +636,26 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>50</y>
         <width>100</width>
         <height>50</height>
        </rect>
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="exit">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>100</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>退出</string>
       </property>
      </widget>
     </widget>

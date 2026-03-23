@@ -34,8 +34,9 @@ private:
 private:
     Ui::MainWindow *ui;
     QString path ;
-    WallpaperLoad * wallpaper;
     zAxisControl * zAxisCtrl;
+    WallpaperLoad * wallpaper;
+
 
 };
 

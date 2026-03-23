@@ -12,8 +12,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , wallpaper(new WallpaperLoad(this))
     , zAxisCtrl(new zAxisControl(this))
+    , wallpaper(new WallpaperLoad(zAxisCtrl,this))
 {
     // 获取Wallpaper目录路径
     path = getWallpaperPath();
@@ -73,7 +73,7 @@ void MainWindow::setWallpaper()
     // 先设置zAxisCtrl为中央部件，这样它的大小会被调整为窗口大小
     //zAxisCtrl是QGraphicsView的子对象
     setCentralWidget(zAxisCtrl);
-    qDebug() << "MainWindow"<<size() << "zAxisCtrl" << zAxisCtrl->getQRect();
+
     // 然后再创建wallpaerWidget，这样它就会使用正确的大小
     wallpaper->setwallpaerWidget(new wallpaerWidget(zAxisCtrl, this));
 
@@ -94,5 +94,5 @@ void MainWindow::setTime()
 void MainWindow::addWdiget()
 {
     //桌面控制,只负责app布局
-    zAxisCtrl->addOverlay("desktop",new desktop(zAxisCtrl));
+    zAxisCtrl->addOverlay("desktop",new desktop(zAxisCtrl),true);
 }

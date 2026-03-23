@@ -16,10 +16,17 @@ void softwareControl::openSoft(const QString &softName)
 
 void softwareControl::openWeather()
 {
+    emit zAxisCtrl->wallpaperStop();
     auto weatherApp = new weather();
     weatherApp->getweatherForCity("成都");
 
     zAxisCtrl->addOverlay("weather",weatherApp);
-    auto wetherWidget = zAxisCtrl->getOvrlay();
+    //绑定退出信号
+    connect(weatherApp,&weather::exit,this,[this](){
+        //程序退出清理资源
+        zAxisCtrl->erase("weather");
+        qDebug() << "weather exit" ;
+        emit zAxisCtrl->wallpaperStart();
+    });
 
 }

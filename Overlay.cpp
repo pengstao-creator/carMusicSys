@@ -12,12 +12,16 @@ Overlay::~Overlay()
 {
 }
 
-void Overlay::addWidget(QWidget *overlyD)
+void Overlay::addWidget(QWidget *overlyD,bool is_transparent)
 {
-    // // 设置透明背景
-    overlyD->setAttribute(Qt::WA_TranslucentBackground);
-    overlyD->setStyleSheet("background: transparent;");
-    setWindowFlags(Qt::FramelessWindowHint);      // 无边框
+    if(is_transparent)
+    {
+        // // 设置透明背景
+        overlyD->setAttribute(Qt::WA_TranslucentBackground);
+        overlyD->setStyleSheet("background: transparent;");
+        setWindowFlags(Qt::FramelessWindowHint);      // 无边框
+
+    }
 
     // 将 QWidget 设置为代理部件
     setWidget(overlyD);

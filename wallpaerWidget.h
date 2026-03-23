@@ -20,6 +20,7 @@ public:
     void setPathFirst(const QString &filePath1,const QString &filePath2);
     void stop();
     void play();
+    void pause();
     const QString &getFile() const;
 
 protected:

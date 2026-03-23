@@ -27,8 +27,8 @@ wallpaerWidget::wallpaerWidget(zAxisControl *zAxisCtrl,QObject *parent)
 void wallpaerWidget::setPlayer()
 {
     // 初始化两个播放器
-    m_player_1->setPlayer(Layer::LAYER_PLAYER_2);
-    m_player_2->setPlayer(Layer::LAYER_PLAYER_1);
+    m_player_1->setWallpaperPlayer(Layer::LAYER_PLAYER_2);
+    m_player_2->setWallpaperPlayer(Layer::LAYER_PLAYER_1);
 
     // 将两个播放器的图形项添加到场景
     zAxis_Ctrl->getScene()->addItem(m_player_1->getPixmapItem());
@@ -79,6 +79,35 @@ void wallpaerWidget::setPathFirst(const QString &filePath1, const QString &fileP
 
 void wallpaerWidget::stop()
 {
+
+    if(is_player_1)
+    {
+        m_player_1->stop();
+    }
+    else
+    {
+        m_player_2->stop();
+    }
+}
+
+
+void wallpaerWidget::play()
+{
+    qDebug() << "play";
+    if(is_player_1)
+    {
+        m_player_1->play();
+        qDebug() << "1 --- play";
+    }
+    else
+    {
+        m_player_2->play();
+        qDebug() << "1 --- play";
+    }
+}
+
+void wallpaerWidget::pause()
+{
     if(is_player_1)
     {
         m_player_1->pause();
@@ -86,19 +115,7 @@ void wallpaerWidget::stop()
     else
     {
         m_player_2->pause();
-    }
-}
 
-
-void wallpaerWidget::play()
-{
-    if(is_player_1)
-    {
-        m_player_1->play();
-    }
-    else
-    {
-        m_player_2->play();
     }
 }
 
@@ -167,7 +184,7 @@ void wallpaerWidget::resizeEvent()
             videoItem->setAspectRatioMode(Qt::KeepAspectRatioByExpanding);
             // 然后设置目标矩形仍为视图大小
             videoItem->setSize(zAxis_Ctrl->getQRect().size());
-            qDebug()<<zAxis_Ctrl->getQRect().size();
+
         }
 
         // 调整图片项大小

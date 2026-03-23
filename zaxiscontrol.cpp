@@ -13,7 +13,6 @@ zAxisControl::~zAxisControl()
 {
     // 清理资源
     qDeleteAll(m_overlay.values());
-    m_overlay.clear();
 }
 
 const QHash<QString,Overlay*>& zAxisControl::getOvrlay() const
@@ -26,10 +25,10 @@ QGraphicsScene *zAxisControl::getScene() const
     return m_scene;
 }
 
-void zAxisControl::addOverlay(const QString &name, QWidget *widget)
+void zAxisControl::addOverlay(const QString &name, QWidget *widget,bool is_transparent)
 {
     addOvrlay({name,new Overlay});
-    m_overlay[name]->addWidget(widget);
+    m_overlay[name]->addWidget(widget,is_transparent);
 }
 
 void zAxisControl::addOvrlay(const std::pair<QString, Overlay *> &overlay)
@@ -43,7 +42,12 @@ void zAxisControl::addOvrlay(const std::pair<QString, Overlay *> &overlay)
     m_overlay.insert(overlay.first, overlay.second);
 }
 
-const QRectF& zAxisControl::getQRect() const
+void zAxisControl::erase(const QString &name)
+{
+    m_overlay.erase(m_overlay.find(name));
+}
+
+QRectF&& zAxisControl::getQRect() const
 {
    return m_scene->sceneRect();
 }

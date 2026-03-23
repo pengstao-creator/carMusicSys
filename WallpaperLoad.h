@@ -5,18 +5,19 @@
 #include <memory>
 class QTimer;
 class wallpaerWidget;
-
+class zAxisControl;
 class WallpaperLoad : public QObject
 {
     Q_OBJECT
 public:
-    explicit WallpaperLoad(QObject *parent = nullptr);
+    explicit WallpaperLoad(zAxisControl * zAxis_Ctrl,QObject *parent = nullptr);
     ~WallpaperLoad();
     void setwallpaerWidget(wallpaerWidget *widget);
     void setPath(const QString &path);
     wallpaerWidget* getwallpaerWidget() const;
     void stop();
     void start();
+    void pause();
 private slots:
     void switchWallpaper();
 
@@ -26,6 +27,7 @@ private:
     std::unique_ptr<wallpaerWidget> _wallpaper;//外部初始化，以为需要其的父对象为QMainWindow
     QStringList _wallpapers;
     QString _path;
+    zAxisControl * zAxisCtrl;
 };
 
 #endif // WALLPAPERLOAD_H

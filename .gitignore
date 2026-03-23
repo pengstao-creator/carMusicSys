@@ -1,6 +1,7 @@
 # Resource directory
 Resource/
-
+Weather/
+        
 # Build files
 build/
 *.pro.user

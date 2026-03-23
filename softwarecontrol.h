@@ -9,6 +9,7 @@ class softwareControl : public QObject
 public:
     explicit softwareControl(zAxisControl * zAxis_Ctrl,QObject *parent = nullptr);
     void openSoft(const QString& softName);
+
 signals:
 private:
     void openWeather();

@@ -1,15 +1,19 @@
 #include "WallpaperLoad.h"
 #include "wallpaerWidget.h"
+#include "zaxiscontrol.h"
 #include <QDir>
 #include <QTimer>
 
-WallpaperLoad::WallpaperLoad(QObject *parent)
+WallpaperLoad::WallpaperLoad(zAxisControl * zAxis_Ctrl,QObject *parent)
     : QObject(parent)
     , _stime(1000*5)
     , _switchTime(std::make_unique<QTimer>(this->parent()))
+    , zAxisCtrl(zAxis_Ctrl)
 {
     // 设置定时器
     connect(_switchTime.get(), &QTimer::timeout, this, &WallpaperLoad::switchWallpaper);
+    connect(zAxisCtrl,&zAxisControl::wallpaperStart,this,&WallpaperLoad::start);
+    connect(zAxisCtrl,&zAxisControl::wallpaperStop,this,&WallpaperLoad::stop);
 }
 
 WallpaperLoad::~WallpaperLoad()
@@ -54,6 +58,12 @@ void WallpaperLoad::start()
 {
     _switchTime->start(_stime);
     _wallpaper->play();
+}
+
+void WallpaperLoad::pause()
+{
+    _switchTime->stop();
+    _wallpaper->pause();
 }
 
 void WallpaperLoad::switchWallpaper()
