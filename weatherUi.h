@@ -1,0 +1,55 @@
+#ifndef WEATHERUI_H
+#define WEATHERUI_H
+
+#include <QWidget>
+#include <QVector>
+#include <QString>
+class QScrollArea;
+class QHBoxLayout;
+class weatherAPI;
+class QPaintEvent;
+class QMouseEvent;
+namespace Ui {
+class WeatherUi;
+}
+
+class WeatherUi : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit WeatherUi(QWidget *parent = nullptr);
+    ~WeatherUi();
+
+    void updateWeather(const QVector<QVector<QString>> &weekForecast);
+    void setBackground(const QString &backgroundPath);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+signals:
+    void exit();
+
+private slots:
+    void on_exitButton_clicked();
+
+    void on_searchButton_clicked();
+
+    void on_confirmSearchButton_clicked();
+
+private:
+    void setupUI();
+    void createDayCard(const QString &date, const QString &amIcon, const QString &amText, 
+                      const QString &pmIcon, const QString &pmText);
+
+    QScrollArea *scrollArea;
+    QWidget *scrollContent;
+    QHBoxLayout *cardsLayout;
+    QVector<QWidget*> dayCards;
+    weatherAPI *weatherService;
+    QString backgroundImagePath;
+    Ui::WeatherUi *ui;
+};
+
+#endif // WEATHERUI_H

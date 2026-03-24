@@ -1,19 +1,47 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "WallpaperLoad.h"
-#include "backgroundwidget.h"
+#include "wallpaerWidget.h"
+#include "desktop.h"
+#include "zaxiscontrol.h"
 #include <QStatusBar>
+#include <QCoreApplication>
+#include <QDir>
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , wallpaper(new WallpaperLoad(this))
+    , zAxisCtrl(new zAxisControl(this))
+    , wallpaper(new WallpaperLoad(zAxisCtrl,this))
 {
+    // 获取Wallpaper目录路径
+    path = getWallpaperPath();
+    
     ui->setupUi(this);
 
     //设置窗口属性
     setMainWindow();
     //设置壁纸
     setWallpaper();
+
+    //添加窗口界面
+    addWdiget();
+}
+
+QString MainWindow::getWallpaperPath()
+{
+    // 动态获取Wallpaper目录路径
+    QString appDir = QCoreApplication::applicationDirPath();
+    // 从appDir中截取到carMusicSys目录
+    QString carMusicSysPath = appDir;
+    QString targetDir = "carMusicSys";
+    int index = carMusicSysPath.indexOf(targetDir);
+    if (index != -1) {
+        // 截取到carMusicSys目录
+        carMusicSysPath = carMusicSysPath.left(index + targetDir.length());
+    }
+    return carMusicSysPath + "/Wallpaper/";
 }
 
 MainWindow::~MainWindow()
@@ -24,13 +52,13 @@ MainWindow::~MainWindow()
 void MainWindow::setMainWindow()
 {
     //固定窗口大小不能拖动更改
-    // setFixedSize(QSize(800,460));
+    // setFixedSize(QSize(800,400));
     // 隐藏状态栏
     statusBar()->hide();
     //设置标题样式
     // 使用 '|' 组合多个标志
     // setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    QIcon icon(":/Wallpaper/5.jpg");
+    QIcon icon(":/Resource/app/5.jpg");
     setWindowIcon(icon);
     setWindowTitle("车载音乐");
 
@@ -42,10 +70,13 @@ void MainWindow::setMainWindow()
 
 void MainWindow::setWallpaper()
 {
-    wallpaper->setBackgroundWidget(new BackgroundWidget(this));
-    // 获取BackgroundWidget的原始指针并设置为中央部件
-    auto bgWidget = wallpaper->getBackgroundWidget();
-    setCentralWidget(bgWidget);
+    // 先设置zAxisCtrl为中央部件，这样它的大小会被调整为窗口大小
+    //zAxisCtrl是QGraphicsView的子对象
+    setCentralWidget(zAxisCtrl);
+
+    // 然后再创建wallpaerWidget，这样它就会使用正确的大小
+    wallpaper->setwallpaerWidget(new wallpaerWidget(zAxisCtrl, this));
+
     // 启动壁纸切换
     wallpaper->setPath(path);
 }
@@ -58,4 +89,10 @@ void MainWindow::switchWallpaper()
 void MainWindow::setTime()
 {
     // 时间设置逻辑
+}
+
+void MainWindow::addWdiget()
+{
+    //桌面控制,只负责app布局
+    zAxisCtrl->addOverlay("desktop",new desktop(zAxisCtrl),true);
 }

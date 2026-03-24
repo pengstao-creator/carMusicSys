@@ -2,7 +2,7 @@
 #define OVERLAY_H
 
 #include <QGraphicsProxyWidget>
-
+class QWidget;
 class Overlay : public QGraphicsProxyWidget
 {
     Q_OBJECT
@@ -10,7 +10,7 @@ class Overlay : public QGraphicsProxyWidget
 public:
     explicit Overlay(QGraphicsItem *parent = nullptr);
     ~Overlay();
-
+    void addWidget(QWidget * overlyD,bool is_transparent = false);
 private:
 };
 

@@ -9,7 +9,7 @@ class QGraphicsVideoItem;
 class QMovie;
 class QMediaPlayer;
 class QAudioOutput;
-
+class QSize;
 
 enum class PlayerType {
     NONPLAYER,
@@ -26,10 +26,15 @@ public:
     ~Player();
     
     void setupPixmap(const QString &path);   // 静态图片 
-    void setupMovie(const QString &path);    // GIF 
-    void setupVideo(const QString &path);    // MP4 
-    void setPlayer(); 
-    bool switchPlayer(PlayerType); 
+    void setupMovie(const QString &path);    // GIF
+    void setupVideo(const QString &path);    // MP4
+    void setWallpaperPlayer(const qreal z);
+    void setPixmapPlayer(const qreal z);
+    void setVideoPlayer(const qreal z);
+    void setMoviePlayer(const qreal z);
+    void pause();
+    void stop();
+    void play();
     bool hidePlayer(PlayerType); 
     bool showPlayer(PlayerType);
     
@@ -46,8 +51,10 @@ private:
     std::unique_ptr<QGraphicsPixmapItem> m_pixmapItem;  // 静态图片项
     std::unique_ptr<QGraphicsVideoItem> m_videoItem;    // 视频项
     std::unique_ptr<QMovie> m_movie;                    // GIF播放器
+    std::unique_ptr<QGraphicsPixmapItem> m_MovieItem;    //gif图片展示
     std::unique_ptr<QMediaPlayer> m_mediaPlayer;        // 视频播放器
     std::unique_ptr<QAudioOutput> m_audioOutput;        // 音频输出
+
     PlayerType ptype;                                   // 当前播放器类型
 };
 

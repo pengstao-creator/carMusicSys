@@ -2,13 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <memory>
 #include <QString>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
+class zAxisControl;
 class WallpaperLoad;
+class Overlay;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -27,10 +27,15 @@ private:
     void setWallpaper();
     void switchWallpaper();
     void setTime();
+    void addWdiget();
+    void addOverlay(const QString& name,QWidget * widget);
+    QString getWallpaperPath();
 private:
     Ui::MainWindow *ui;
-    QString path = "D:/code/QT/carMusicSys/Wallpaper/";
-    std::unique_ptr<WallpaperLoad> wallpaper;
+    QString path ;
+    zAxisControl * zAxisCtrl;
+    WallpaperLoad * wallpaper;
+
 
 };
 

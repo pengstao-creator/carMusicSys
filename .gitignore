@@ -1,24 +1,16 @@
-# Qt build files
-build/
-Makefile
-Makefile.Debug
-Makefile.Release
-
-# Qt creator files
-.qtcreator/
-carMusicSys.pro.user
-.qmake.stash
-
-# CMake files
-CMakeLists.txt
-
-# Resource files (wallpapers)
+# Resource and Wallpaper directories
+Resource/
+Weather/
 Wallpaper/
+build/
+*.pro.user
+*.pro.user.*
+*.qmake.stash
 
 # IDE files
 .idea/
 .vscode/
 
-# OS files
+# OS generated files
 .DS_Store
 Thumbs.db

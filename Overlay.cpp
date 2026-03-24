@@ -1,19 +1,31 @@
 #include "Overlay.h"
+#include <QDate>
+#include <QTime>
+#include <QTimer>
 #include <QWidget>
-
 Overlay::Overlay(QGraphicsItem *parent)
     : QGraphicsProxyWidget(parent)
 {
-    // 创建一个空的 QWidget
-    QWidget *widget = new QWidget();
-    // 设置透明背景
-    widget->setAttribute(Qt::WA_TranslucentBackground);
-    widget->setStyleSheet("background: transparent;");
-    setFlag(ItemIgnoresTransformations); // 保持控件大小不随视图缩放
-    // 将 QWidget 设置为代理部件
-    setWidget(widget);
 }
 
 Overlay::~Overlay()
 {
 }
+
+void Overlay::addWidget(QWidget *overlyD,bool is_transparent)
+{
+    if(is_transparent)
+    {
+        // // 设置透明背景
+        overlyD->setAttribute(Qt::WA_TranslucentBackground);
+        overlyD->setStyleSheet("background: transparent;");
+        setWindowFlags(Qt::FramelessWindowHint);      // 无边框
+
+    }
+
+    // 将 QWidget 设置为代理部件
+    setWidget(overlyD);
+}
+
+
+

@@ -1,22 +1,27 @@
 #include "WallpaperLoad.h"
-#include "backgroundwidget.h"
+#include "wallpaerWidget.h"
+#include "zaxiscontrol.h"
 #include <QDir>
 #include <QTimer>
 
-WallpaperLoad::WallpaperLoad(QObject *parent)
+WallpaperLoad::WallpaperLoad(zAxisControl * zAxis_Ctrl,QObject *parent)
     : QObject(parent)
     , _stime(1000*5)
     , _switchTime(std::make_unique<QTimer>(this->parent()))
+    , zAxisCtrl(zAxis_Ctrl)
 {
     // 设置定时器
     connect(_switchTime.get(), &QTimer::timeout, this, &WallpaperLoad::switchWallpaper);
+    connect(zAxisCtrl,&zAxisControl::wallpaperStart,this,&WallpaperLoad::start);
+    connect(zAxisCtrl,&zAxisControl::wallpaperStop,this,&WallpaperLoad::pause);
+    connect(zAxisCtrl,&zAxisControl::wallpaperStop,this,&WallpaperLoad::stop);
 }
 
 WallpaperLoad::~WallpaperLoad()
 {
 }
 
-void WallpaperLoad::setBackgroundWidget(BackgroundWidget *widget)
+void WallpaperLoad::setwallpaerWidget(wallpaerWidget *widget)
 {
     _wallpaper.reset(widget);
 }
@@ -28,12 +33,38 @@ void WallpaperLoad::setPath(const QString &path)
     // 获取所有壁纸名称
     QDir dir(_path);
     _wallpapers = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-    // 将第一张设为壁纸
+    // 将第一张第二张先添加设为壁纸
     if(!_wallpapers.isEmpty() && _wallpaper)
     {
-        _wallpaper->setBackground(_path + _wallpapers[0]);
+        if(_wallpapers.size() >= 2)
+        {
+            _wallpaper->setPathFirst(_path + _wallpapers[0],_path + _wallpapers[1]);
+        }
+        else
+        {
+            _wallpaper->setPathFirst(_path + _wallpapers[0],_path + _wallpapers[0]);
+        }
+
         _switchTime->start(_stime);
     }
+}
+
+void WallpaperLoad::stop()
+{
+    _switchTime->stop();
+    _wallpaper->stop();
+}
+
+void WallpaperLoad::start()
+{
+    _switchTime->start(_stime);
+    _wallpaper->play();
+}
+
+void WallpaperLoad::pause()
+{
+    _switchTime->stop();
+    _wallpaper->pause();
 }
 
 void WallpaperLoad::switchWallpaper()
@@ -47,16 +78,11 @@ void WallpaperLoad::switchWallpaper()
         {
             if(is_true)
             {
-                _wallpaper->setBackground(_path + name);
+                _wallpaper->setPath(_path + name);
                 is_true = false;
             }
             if(name == filename) is_true = true;
         }
-        if(is_true) _wallpaper->setBackground(_path + _wallpapers[0]);
+        if(is_true) _wallpaper->setPath(_path + _wallpapers[0]);
     }
-}
-
-BackgroundWidget* WallpaperLoad::getBackgroundWidget() const
-{
-    return _wallpaper.get();
 }
