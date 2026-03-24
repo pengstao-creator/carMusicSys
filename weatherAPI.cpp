@@ -15,15 +15,25 @@
 #include <QJsonArray>
 #include <QLocale>
 #include <QDate>
+#include <QRegularExpression>
+#include <QDir>
+#include <QFileInfo>
+
+namespace {
+const QString kDefaultCityId = QString::fromUtf8(carMusicSysconfig::DEFAULT_CITY_ID);
+const QString kCityLookupPrefix = QString::fromUtf8(carMusicSysconfig::CITY_LOOKUP_KEY_PREFIX);
+}
 
 weatherAPI::weatherAPI(QObject *parent)
     : QObject(parent)
     , cacheData(std::make_unique<CacheManager<WeatherData>>(
           carMusicSysconfig::CACHEDATA_BASE, carMusicSysconfig::WEAATHER_TIMEOUT_H))
+    , cityLookupCacheData(std::make_unique<CacheManager<CityLookupData>>(
+          carMusicSysconfig::CACHEDATA_BASE, carMusicSysconfig::WEAATHER_TIMEOUT_H))
 {
     manager = new QNetworkAccessManager(this);
-    // 连接管理器的finished信号到我们的处理槽函数
     connect(manager, &QNetworkAccessManager::finished, this, &weatherAPI::onReplyFinished);
+    loadCityIdCache();
 }
 
 weatherAPI::~weatherAPI()
@@ -60,43 +70,152 @@ public:
     }
 };
 
+class weatherAPI::CityLookupData
+{
+public:
+    QString cityName;
+    QString cityId;
+
+    QByteArray toJson() const
+    {
+        QJsonObject obj;
+        obj["cityName"] = cityName;
+        obj["cityId"] = cityId;
+        return QJsonDocument(obj).toJson();
+    }
+
+    bool fromJson(const QByteArray &jsonData)
+    {
+        QJsonDocument doc = QJsonDocument::fromJson(jsonData);
+        if (doc.isNull()) return false;
+        QJsonObject obj = doc.object();
+        cityName = obj.value("cityName").toString();
+        cityId = obj.value("cityId").toString();
+        return !cityName.isEmpty() && !cityId.isEmpty();
+    }
+};
+
+QString weatherAPI::cityLookupKey(const QString &cityName) const
+{
+    QString key = cityName.trimmed();
+    key.replace(QRegularExpression("[\\\\/:*?\"<>|\\s]+"), "_");
+    return kCityLookupPrefix + key;
+}
+
+void weatherAPI::loadCityIdCache()
+{
+    cityIdMap.clear();
+    const QDir dir(cityLookupCacheData->getcacheDir());
+    const QStringList files = dir.entryList(QStringList() << QString("%1*.json").arg(kCityLookupPrefix), QDir::Files);
+    for (const QString &fileName : files) {
+        QString key = QFileInfo(fileName).completeBaseName();
+        CityLookupData data;
+        if (cityLookupCacheData->load(key, data)) {
+            cityIdMap.insert(data.cityName, data.cityId);
+        }
+    }
+}
+
+void weatherAPI::saveCityIdCache(const QString &cityName, const QString &resolvedCityId)
+{
+    CityLookupData data;
+    data.cityName = cityName;
+    data.cityId = resolvedCityId;
+    cityLookupCacheData->save(cityLookupKey(cityName), data);
+    cityIdMap.insert(cityName, resolvedCityId);
+}
+
 void weatherAPI::getweatherForCity(const QString &cityName)
 {
-    // 判断缓存数据是否符合条件
+    const QString input = cityName.trimmed();
+    cityId.clear();
+    if (input.isEmpty()) {
+        cityId = kDefaultCityId;
+    } else if (cityIdMap.contains(input)) {
+        cityId = cityIdMap.value(input);
+    }
+
     WeatherData weatherCache;
-    if (cacheData->load(carMusicSysconfig::CACHE_WEATHER, weatherCache))
+    if (!cityId.isEmpty() && cacheData->load(cityId, weatherCache))
     {
         parseweatherJson(weatherCache.toJson());
         return;
     }
     qDebug() << "开始API 请求";
-    const QString location = cityName.trimmed().isEmpty() ? QStringLiteral("101270101") : cityName.trimmed();
-    QString urlString = QString("https://n36cdphw5g.re.qweatherapi.com/v7/weather/7d?location=%1&key=%2")
-                            .arg(location)
-                            .arg(carMusicSysconfig::WEATHER_API_KEY);
-    QUrl url(urlString);
-    QNetworkRequest request(url);
+    if (!cityId.isEmpty()) {
+        QString urlString = QString(carMusicSysconfig::WEATHER_API_7D_URL)
+                                .arg(cityId)
+                                .arg(carMusicSysconfig::WEATHER_API_KEY);
+        QNetworkRequest request{QUrl(urlString)};
+        QNetworkReply *reply = manager->get(request);
+        reply->setProperty(carMusicSysconfig::REQUEST_TYPE_KEY, carMusicSysconfig::REQUEST_TYPE_WEATHER);
+        reply->setProperty(carMusicSysconfig::REQUEST_CITY_ID_KEY, cityId);
+        return;
+    }
+    getCityId(input);
+}
 
-    // 发送GET请求
-    manager->get(request);
+void weatherAPI::getCityId(const QString &cityName)
+{
+    QString urlString = QString(carMusicSysconfig::WEATHER_CITY_LOOKUP_URL)
+                            .arg(cityName)
+                            .arg(carMusicSysconfig::WEATHER_API_KEY);
+    QNetworkRequest request{QUrl(urlString)};
+    QNetworkReply *reply = manager->get(request);
+    reply->setProperty(carMusicSysconfig::REQUEST_TYPE_KEY, carMusicSysconfig::REQUEST_TYPE_CITY_LOOKUP);
+    reply->setProperty(carMusicSysconfig::REQUEST_CITY_NAME_KEY, cityName);
 }
 
 void weatherAPI::onReplyFinished(QNetworkReply *reply)
 {
-    // 检查网络错误和HTTP状态码
+    if (reply->property(carMusicSysconfig::REQUEST_TYPE_KEY).toString() == carMusicSysconfig::REQUEST_TYPE_CITY_LOOKUP) {
+        onCitySearchFinished(reply);
+        return;
+    }
     if (reply->error() == QNetworkReply::NoError) {
         int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-        if (statusCode == 200) { // 请求成功
+        if (statusCode == carMusicSysconfig::HTTP_STATUS_OK) {
             QByteArray data = reply->readAll();
+            cityId = reply->property(carMusicSysconfig::REQUEST_CITY_ID_KEY).toString();
             qDebug() << "Received data:" << data;
-            parseweatherJson(data); // 解析数据
+            parseweatherJson(data);
         } else {
             qWarning() << "HTTP error, status code:" << statusCode;
         }
     } else {
         qWarning() << "Network error:" << reply->errorString();
     }
-    reply->deleteLater(); // 释放reply对象
+    reply->deleteLater();
+}
+
+void weatherAPI::onCitySearchFinished(QNetworkReply *reply)
+{
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        QJsonObject obj = doc.object();
+        if (obj.value("code").toString() == carMusicSysconfig::API_CODE_OK) {
+            QJsonArray locationArray = obj.value("location").toArray();
+            if (!locationArray.isEmpty()) {
+                QString queriedCityId = locationArray[0].toObject().value("id").toString();
+                if (!queriedCityId.isEmpty()) {
+                    cityId = queriedCityId;
+                    const QString cityName = reply->property(carMusicSysconfig::REQUEST_CITY_NAME_KEY).toString();
+                    saveCityIdCache(cityName, cityId);
+                    QString weatherUrl = QString(carMusicSysconfig::WEATHER_API_7D_URL)
+                                             .arg(cityId)
+                                             .arg(carMusicSysconfig::WEATHER_API_KEY);
+                    QNetworkRequest request{QUrl(weatherUrl)};
+                    QNetworkReply *weatherReply = manager->get(request);
+                    weatherReply->setProperty(carMusicSysconfig::REQUEST_TYPE_KEY, carMusicSysconfig::REQUEST_TYPE_WEATHER);
+                    weatherReply->setProperty(carMusicSysconfig::REQUEST_CITY_ID_KEY, cityId);
+                }
+            }
+        }
+    } else {
+        qWarning() << "City lookup network error:" << reply->errorString();
+    }
+    reply->deleteLater();
 }
 
 void weatherAPI::parseweatherJson(const QByteArray &jsonData)
@@ -111,7 +230,7 @@ void weatherAPI::parseweatherJson(const QByteArray &jsonData)
 
     // 检查返回码，200表示成功
     QString code = rootObj.value("code").toString();
-    if (code != "200") {
+    if (code != carMusicSysconfig::API_CODE_OK) {
         qWarning() << "API returned error code:" << code;
         return;
     }
@@ -151,8 +270,8 @@ void weatherAPI::parseweatherJson(const QByteArray &jsonData)
     WeatherData weatherCache;
     if (weatherCache.fromJson(jsonData))
     {
-        cacheData->save(carMusicSysconfig::CACHE_WEATHER, weatherCache);
+        const QString weatherKey = cityId.isEmpty() ? kDefaultCityId : cityId;
+        cacheData->save(weatherKey, weatherCache);
     }
-    // 发出信号，传递数据到UI
     emit weatherDataReady(weekForecast);
 }

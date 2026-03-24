@@ -1,5 +1,6 @@
 #include "Overlay.h"
 #include <QDate>
+#include <QGraphicsScene>
 #include <QTime>
 #include <QTimer>
 #include <QWidget>
@@ -25,7 +26,9 @@ void Overlay::addWidget(QWidget *overlyD,bool is_transparent)
 
     // 将 QWidget 设置为代理部件
     setWidget(overlyD);
+    if (scene()) {
+        setGeometry(scene()->sceneRect());
+    }
 }
-
 
 

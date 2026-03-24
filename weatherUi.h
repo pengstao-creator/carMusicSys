@@ -25,6 +25,7 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -40,6 +41,7 @@ private slots:
 
 private:
     void setupUI();
+    void rebuildWeatherCards();
     void createDayCard(const QString &date, const QString &amIcon, const QString &amText, 
                       const QString &pmIcon, const QString &pmText);
 
@@ -49,6 +51,7 @@ private:
     QVector<QWidget*> dayCards;
     weatherAPI *weatherService;
     QString backgroundImagePath;
+    QVector<QVector<QString>> latestForecast;
     Ui::WeatherUi *ui;
 };
 

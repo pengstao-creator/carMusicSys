@@ -1,19 +1,20 @@
 #include "WallpaperLoad.h"
 #include "wallpaerWidget.h"
 #include "zaxiscontrol.h"
+#include "Data.h"
 #include <QDir>
 #include <QTimer>
 
 WallpaperLoad::WallpaperLoad(zAxisControl * zAxis_Ctrl,QObject *parent)
     : QObject(parent)
-    , _stime(1000*5)
+    , _stime(carMusicSysconfig::WALLPAPER_SWITCH_INTERVAL_MS)
     , _switchTime(std::make_unique<QTimer>(this->parent()))
     , zAxisCtrl(zAxis_Ctrl)
 {
     // 设置定时器
     connect(_switchTime.get(), &QTimer::timeout, this, &WallpaperLoad::switchWallpaper);
     connect(zAxisCtrl,&zAxisControl::wallpaperStart,this,&WallpaperLoad::start);
-    connect(zAxisCtrl,&zAxisControl::wallpaperStop,this,&WallpaperLoad::pause);
+    connect(zAxisCtrl,&zAxisControl::wallpaperPause,this,&WallpaperLoad::pause);
     connect(zAxisCtrl,&zAxisControl::wallpaperStop,this,&WallpaperLoad::stop);
 }
 

@@ -2,29 +2,34 @@
 #include "ui_desktop.h"
 #include "zaxiscontrol.h"
 #include "softwarecontrol.h"
+#include "Data.h"
 #include <QTime>
 #include <QDate>
 #include <QLocale>
 #include <QTimer>
-#include <QVBoxLayout>
-#include <QMouseEvent>
-#include <QGraphicsBlurEffect>
 #include <QLabel>
+#include <QPushButton>
 #include <QResizeEvent>
+#include <QShowEvent>
+#include <QSizePolicy>
 desktop::desktop(zAxisControl * zAxis_Ctrl,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::desktop)
     , timeclock(new QTimer(this))
-    , timecontainer(new QWidget(this))
+    , timeHmsLabel(nullptr)
+    , timeYmdLabel(nullptr)
     , zAxisCtrl(zAxis_Ctrl)
     , softCtrl(new softwareControl(zAxisCtrl,this))
 
 {
     ui->setupUi(this);
-    timecontainer->setGeometry(280,30,200,150);
-    setBaseSize(size().width(),size().height());
-    //进入密码界面
+    ui->rootLayout->setStretch(0, 3);
+    ui->rootLayout->setStretch(1, 2);
+    ui->rootLayout->setStretch(2, 3);
+    timeHmsLabel = ui->timeHmsLabel;
+    timeYmdLabel = ui->timeYmdLabel;
     windowDesign();
+    QTimer::singleShot(0, this, [this]() { updateIconButtonSizes(); });
 
 }
 
@@ -33,85 +38,35 @@ desktop::~desktop()
     delete ui;
 }
 
+void desktop::windowDesign()
+{
+    setupButtonBaseStyle();
+    setupIconButtons();
+    setTime();
+}
+
 void desktop::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-
-    if(timecontainer)
-    {
-        //计算缩放比例
-        double wideRatio = (double)size().width() / baseSize().width();
-        double highRatio = (double)size().height()/ baseSize().height();
-        //从新设置容器大小,按照初始位置进行缩放
-        int  newx = 280 * wideRatio;
-        int newy= 30 * highRatio;
-        int neww = 200 * wideRatio;
-        int newh = 150 * highRatio;
-        timecontainer->setGeometry(newx,newy,neww,newh);
-    }
-
-
+    updateIconButtonSizes();
 }
 
-
-
-// void desktop::mousePressEvent(QMouseEvent *event)
-// {
-//     if (event->button() == Qt::LeftButton) {
-
-//     } else if (event->button() == Qt::RightButton) {
-//         qDebug() << "右键按下，位置：" << event->pos();
-//     }
-//     // 调用基类，以便事件继续传递（如果需要）
-//     QWidget::mousePressEvent(event);
-// }
-
-void desktop::windowDesign()
+void desktop::showEvent(QShowEvent *event)
 {
-    setTime();
-
+    QWidget::showEvent(event);
+    updateIconButtonSizes();
 }
 
 void desktop::setTime()
 {
-    // 创建垂直布局，整体居中
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    QLabel *time_hms = new QLabel("Label 1");
-    QLabel *time_ymd = new QLabel("Label 2");
-    layout->addWidget(time_hms);
-    layout->addWidget(time_ymd);
-    layout->setSpacing(10);
-    layout->setAlignment(Qt::AlignCenter);  // 整体居中
-    // //设置拉伸策略
-    time_hms->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    time_ymd->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    timecontainer->setLayout(layout);
-
-    time_hms->setStyleSheet(
-        "QLabel {"
-        "   color: rgb(255, 255, 255);"
-        "   font: 700 italic 48pt 'Segoe UI', 'Microsoft YaHei';"
-        "   background: transparent;"
-        "   border: none;"
-        "   qproperty-alignment: AlignCenter;"
-        "}"
-        );
-    time_ymd->setStyleSheet(
-        "QLabel {"
-        "   color: rgba(255, 255, 255, 0.85);"
-        "   font: 400 12pt 'Segoe UI', 'Microsoft YaHei';"
-        "   background: transparent;"
-        "   border: none;"
-        "   qproperty-alignment: AlignCenter;"
-        "}"
-        );
-
-    connect(timeclock,&QTimer::timeout,this,[time_ymd,time_hms,this](){
-        getTime(time_ymd,time_hms);
+    if (!timeHmsLabel || !timeYmdLabel) {
+        return;
+    }
+    connect(timeclock,&QTimer::timeout,this,[this](){
+        getTime(timeYmdLabel,timeHmsLabel);
     });
-    getTime(time_ymd,time_hms);
-    timeclock->start(1000*1);
+    getTime(timeYmdLabel,timeHmsLabel);
+    timeclock->start(carMusicSysconfig::CLOCK_TICK_INTERVAL_MS);
 }
 
 void desktop::getTime(QLabel* ymd, QLabel* hms)
@@ -130,29 +85,80 @@ void desktop::getTime(QLabel* ymd, QLabel* hms)
 
 void desktop::on_weather_clicked()
 {
-    openSoft("weather");
+    openSoft(carMusicSysconfig::APP_WEATHER);
 }
 
 
 void desktop::on_QQMusic_clicked()
 {
-    openSoft("QQMusic");
+    openSoft(carMusicSysconfig::APP_QQMUSIC);
 }
 
 
 void desktop::on_amap_clicked()
 {
-    openSoft("amap");
+    openSoft(carMusicSysconfig::APP_AMAP);
 }
 
 
 void desktop::on_bilibili_clicked()
 {
-    openSoft("bilibili");
+    openSoft(carMusicSysconfig::APP_BILIBILI);
 }
 
 void desktop::openSoft(const QString &softName)
 {
     softCtrl->openSoft(softName);
+}
+
+void desktop::setupButtonBaseStyle()
+{
+    const QList<QPushButton*> buttons = findChildren<QPushButton*>();
+    for (QPushButton *button : buttons) {
+        button->setText(QString());
+        button->setFlat(true);
+        button->setStyleSheet("QPushButton{border:none;background:transparent;} QPushButton:pressed{background:rgba(255,255,255,25);}");
+    }
+}
+
+void desktop::setupIconButtons()
+{
+    ui->leftGridLayout->setRowStretch(0, 1);
+    ui->leftGridLayout->setRowStretch(1, 1);
+    ui->leftGridLayout->setColumnStretch(0, 1);
+    ui->leftGridLayout->setColumnStretch(1, 1);
+
+    const QList<QPushButton*> iconButtons = { ui->weather, ui->QQMusic, ui->amap, ui->bilibili };
+    const QList<QString> iconPaths = {
+        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "6.png",
+        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "2.png",
+        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "4.png",
+        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "3.png"
+    };
+
+    for (int i = 0; i < iconButtons.size(); ++i) {
+        QPushButton *button = iconButtons[i];
+        button->setStyleSheet("QPushButton{border:none;background:transparent;} QPushButton:pressed{background:rgba(255,255,255,25);}");
+        button->setText(QString());
+        button->setIcon(QIcon(iconPaths[i]));
+        button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        button->setMinimumSize(72, 72);
+    }
+
+    const QList<QPushButton*> buttons = findChildren<QPushButton*>();
+    for (QPushButton *button : buttons) {
+        const bool hasIcon = !button->icon().isNull();
+        button->setEnabled(hasIcon);
+    }
+    updateIconButtonSizes();
+}
+
+void desktop::updateIconButtonSizes()
+{
+    const QList<QPushButton*> iconButtons = { ui->weather, ui->QQMusic, ui->amap, ui->bilibili };
+    for (QPushButton *button : iconButtons) {
+        const int side = qMax(24, qMin(button->width(), button->height()) - 16);
+        button->setIconSize(QSize(side, side));
+    }
 }
 

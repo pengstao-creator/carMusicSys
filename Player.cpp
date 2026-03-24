@@ -75,7 +75,7 @@ void Player::setMoviePlayer(const qreal z)
 
 void Player::pause()
 {
-    if(m_mediaPlayer)return;
+    if(!m_mediaPlayer)return;
     m_mediaPlayer->pause();
 }
 

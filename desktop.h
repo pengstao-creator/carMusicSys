@@ -9,6 +9,7 @@ class desktop;
 class wallpaerWidget;
 class QLabel;
 class QResizeEvent;
+class QShowEvent;
 class QTimer;
 class QString;
 class zAxisControl;
@@ -23,7 +24,8 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
-    // void mousePressEvent(QMouseEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void on_weather_clicked();
 
@@ -38,10 +40,14 @@ private:
     void windowDesign();
     void setTime();
     void getTime(QLabel* ymd, QLabel* hms);
+    void setupButtonBaseStyle();
+    void setupIconButtons();
+    void updateIconButtonSizes();
 
     Ui::desktop *ui;
     QTimer * timeclock;
-    QWidget * timecontainer;
+    QLabel *timeHmsLabel;
+    QLabel *timeYmdLabel;
     zAxisControl * zAxisCtrl;
     softwareControl * softCtrl;
 

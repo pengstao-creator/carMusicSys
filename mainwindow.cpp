@@ -4,6 +4,7 @@
 #include "wallpaerWidget.h"
 #include "desktop.h"
 #include "zaxiscontrol.h"
+#include "Data.h"
 #include <QStatusBar>
 #include <QCoreApplication>
 #include <QDir>
@@ -35,13 +36,13 @@ QString MainWindow::getWallpaperPath()
     QString appDir = QCoreApplication::applicationDirPath();
     // 从appDir中截取到carMusicSys目录
     QString carMusicSysPath = appDir;
-    QString targetDir = "carMusicSys";
+    QString targetDir = carMusicSysconfig::PROJECT_ROOT_NAME;
     int index = carMusicSysPath.indexOf(targetDir);
     if (index != -1) {
         // 截取到carMusicSys目录
         carMusicSysPath = carMusicSysPath.left(index + targetDir.length());
     }
-    return carMusicSysPath + "/Wallpaper/";
+    return carMusicSysPath + carMusicSysconfig::WALLPAPER_DIR_SUFFIX;
 }
 
 MainWindow::~MainWindow()
@@ -58,7 +59,7 @@ void MainWindow::setMainWindow()
     //设置标题样式
     // 使用 '|' 组合多个标志
     // setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    QIcon icon(":/Resource/app/5.jpg");
+    QIcon icon(carMusicSysconfig::APP_ICON_PATH);
     setWindowIcon(icon);
     setWindowTitle("车载音乐");
 
@@ -94,5 +95,5 @@ void MainWindow::setTime()
 void MainWindow::addWdiget()
 {
     //桌面控制,只负责app布局
-    zAxisCtrl->addOverlay("desktop",new desktop(zAxisCtrl),true);
+    zAxisCtrl->addOverlay(carMusicSysconfig::OVERLAY_DESKTOP,new desktop(zAxisCtrl),true);
 }

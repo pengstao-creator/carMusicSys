@@ -11,22 +11,30 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QPushButton>
+#include <QResizeEvent>
 #include <QScrollArea>
 #include <QSvgRenderer>
 #include <QtGlobal>
 #include <QVBoxLayout>
 
 namespace {
+constexpr int kBaseWindowWidth = 800;
+constexpr int kBaseWindowHeight = 400;
 constexpr int kCardWidth = 160;
 constexpr int kCardSpacing = 15;
 constexpr int kCardMargin = 16;
+constexpr int kCardInnerSpacing = 12;
+constexpr int kIconSize = 32;
+constexpr int kAmPmSpacing = 8;
+constexpr int kDateFontSize = 14;
+constexpr int kTextFontSize = 12;
 
-QLabel *createSvgLabel(const QString &iconPath, QWidget *parent)
+QLabel *createSvgLabel(const QString &iconPath, QWidget *parent, int iconSize)
 {
     QLabel *label = new QLabel(parent);
-    label->setFixedSize(32, 32);
+    label->setFixedSize(iconSize, iconSize);
 
-    QPixmap pixmap(32, 32);
+    QPixmap pixmap(iconSize, iconSize);
     pixmap.fill(Qt::transparent);
 
     QSvgRenderer renderer(iconPath);
@@ -62,8 +70,7 @@ void WeatherUi::setupUI()
 {
     // 初始化UI布局
     ui->setupUi(this);
-    // 设置窗口固定大小为800×400
-    setFixedSize(800, 400);
+    resize(kBaseWindowWidth, kBaseWindowHeight);
     // 设置窗口对象名，用于样式表
     setObjectName("weatherMainWidget");
 
@@ -120,10 +127,21 @@ void WeatherUi::setupUI()
 void WeatherUi::createDayCard(const QString &date, const QString &amIcon, const QString &amText, 
                              const QString &pmIcon, const QString &pmText)
 {
+    const qreal scale = qMin(static_cast<qreal>(width()) / kBaseWindowWidth,
+                             static_cast<qreal>(height()) / kBaseWindowHeight);
+    const qreal effectiveScale = qMax<qreal>(0.6, scale);
+    const int cardWidth = qMax(120, qRound(kCardWidth * effectiveScale));
+    const int cardMargin = qMax(8, qRound(kCardMargin * effectiveScale));
+    const int cardInnerSpacing = qMax(6, qRound(kCardInnerSpacing * effectiveScale));
+    const int iconSize = qMax(18, qRound(kIconSize * effectiveScale));
+    const int amPmSpacing = qMax(4, qRound(kAmPmSpacing * effectiveScale));
+    const int dateFontSize = qMax(10, qRound(kDateFontSize * effectiveScale));
+    const int textFontSize = qMax(9, qRound(kTextFontSize * effectiveScale));
+
     // 创建卡片容器
     QWidget *card = new QWidget(scrollContent);
     card->setObjectName("weatherDayCard");
-    card->setFixedWidth(kCardWidth);
+    card->setFixedWidth(cardWidth);
     card->setStyleSheet(
         "QWidget#weatherDayCard { "
         "    background: rgba(255, 255, 255, 0.30); "
@@ -133,14 +151,15 @@ void WeatherUi::createDayCard(const QString &date, const QString &amIcon, const 
 
     // 创建卡片内部布局
     QVBoxLayout *cardLayout = new QVBoxLayout(card);
-    cardLayout->setContentsMargins(kCardMargin, kCardMargin, kCardMargin, kCardMargin);
-    cardLayout->setSpacing(12);
+    cardLayout->setContentsMargins(cardMargin, cardMargin, cardMargin, cardMargin);
+    cardLayout->setSpacing(cardInnerSpacing);
 
     // 日期标签
     QLabel *dateLabel = new QLabel(date, card);
     dateLabel->setObjectName("weatherDateLabel");
     dateLabel->setAlignment(Qt::AlignCenter);
-    dateLabel->setStyleSheet("QLabel#weatherDateLabel { color: white; font-size: 14px; font-weight: bold; }");
+    dateLabel->setStyleSheet(QString("QLabel#weatherDateLabel { color: white; font-size: %1px; font-weight: bold; }")
+                                 .arg(dateFontSize));
     cardLayout->addWidget(dateLabel);
 
     // 早上天气
@@ -148,11 +167,11 @@ void WeatherUi::createDayCard(const QString &date, const QString &amIcon, const 
     amWidget->setStyleSheet("background: transparent;");
     QHBoxLayout *amLayout = new QHBoxLayout(amWidget);
     amLayout->setContentsMargins(0, 0, 0, 0);
-    amLayout->setSpacing(8);
+    amLayout->setSpacing(amPmSpacing);
 
-    QLabel *amSvg = createSvgLabel(amIcon, amWidget);
+    QLabel *amSvg = createSvgLabel(amIcon, amWidget, iconSize);
     QLabel *amLabel = new QLabel(amText, amWidget);
-    amLabel->setStyleSheet("color: white; font-size: 12px;");
+    amLabel->setStyleSheet(QString("color: white; font-size: %1px;").arg(textFontSize));
 
     amLayout->addWidget(amSvg);
     amLayout->addWidget(amLabel);
@@ -163,11 +182,11 @@ void WeatherUi::createDayCard(const QString &date, const QString &amIcon, const 
     pmWidget->setStyleSheet("background: transparent;");
     QHBoxLayout *pmLayout = new QHBoxLayout(pmWidget);
     pmLayout->setContentsMargins(0, 0, 0, 0);
-    pmLayout->setSpacing(8);
+    pmLayout->setSpacing(amPmSpacing);
 
-    QLabel *pmSvg = createSvgLabel(pmIcon, pmWidget);
+    QLabel *pmSvg = createSvgLabel(pmIcon, pmWidget, iconSize);
     QLabel *pmLabel = new QLabel(pmText, pmWidget);
-    pmLabel->setStyleSheet("color: white; font-size: 12px;");
+    pmLabel->setStyleSheet(QString("color: white; font-size: %1px;").arg(textFontSize));
 
     pmLayout->addWidget(pmSvg);
     pmLayout->addWidget(pmLabel);
@@ -179,15 +198,19 @@ void WeatherUi::createDayCard(const QString &date, const QString &amIcon, const 
 
 void WeatherUi::updateWeather(const QVector<QVector<QString>> &weekForecast)
 {
-    // 清空现有卡片
+    latestForecast = weekForecast;
+    rebuildWeatherCards();
+}
+
+void WeatherUi::rebuildWeatherCards()
+{
     for (QWidget *card : dayCards) {
         cardsLayout->removeWidget(card);
         delete card;
     }
     dayCards.clear();
 
-    // 创建新卡片（不足 7 天时补占位，保持完整界面）
-    for (const QVector<QString> &dayData : weekForecast) {
+    for (const QVector<QString> &dayData : latestForecast) {
         if (dayData.size() >= 7) {
             QString date = dayData[0];
             QString amIcon = dayData[1];
@@ -199,11 +222,24 @@ void WeatherUi::updateWeather(const QVector<QVector<QString>> &weekForecast)
         }
     }
 
-    // 依据卡片数设置内容最小宽度，保证横向滚动行为稳定
+    const qreal scale = qMin(static_cast<qreal>(width()) / kBaseWindowWidth,
+                             static_cast<qreal>(height()) / kBaseWindowHeight);
+    const qreal effectiveScale = qMax<qreal>(0.6, scale);
+    const int scaledCardWidth = qMax(120, qRound(kCardWidth * effectiveScale));
+    const int scaledCardSpacing = qMax(6, qRound(kCardSpacing * effectiveScale));
     const int cardCount = dayCards.size();
-    const int contentWidth = (cardCount * kCardWidth) + (qMax(0, cardCount - 1) * kCardSpacing);
+    const int contentWidth = (cardCount * scaledCardWidth) + (qMax(0, cardCount - 1) * scaledCardSpacing);
+    cardsLayout->setSpacing(scaledCardSpacing);
     scrollContent->setMinimumWidth(contentWidth);
     scrollContent->adjustSize();
+}
+
+void WeatherUi::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    if (!latestForecast.isEmpty()) {
+        rebuildWeatherCards();
+    }
 }
 
 void WeatherUi::setBackground(const QString &backgroundPath)
@@ -255,6 +291,7 @@ void WeatherUi::on_exitButton_clicked()
 void WeatherUi::on_searchButton_clicked()
 {
     // 切换搜索面板的可见状态
+    ui->searchButton->hide();
     const bool show = !ui->searchPanel->isVisible();
     ui->searchPanel->setVisible(show);
     // 如果显示搜索面板，设置城市输入框为焦点
@@ -273,18 +310,17 @@ void WeatherUi::on_confirmSearchButton_clicked()
     // 获取并修剪输入的城市名
     const QString city = ui->cityLineEdit->text().trimmed();
     // 如果城市名为空，直接返回
-    if (city.isEmpty()) {
-        return;
+    if (!city.isEmpty()) {
+        // 更新城市天气标签
+        if (ui->cityWeatherLabel) {
+            ui->cityWeatherLabel->setText(city);
+        }
+        // 调用天气服务获取该城市的天气
+        weatherService->getweatherForCity(city);
     }
-    // 更新城市天气标签
-    if (ui->cityWeatherLabel) {
-        ui->cityWeatherLabel->setText(city);
-    }
-    // 调用天气服务获取该城市的天气
-    weatherService->getweatherForCity(city);
+
     // 隐藏搜索面板
-    if (ui->searchPanel) {
-        ui->searchPanel->setVisible(false);
-    }
+    ui->searchPanel->setVisible(false);
+    ui->searchButton->show();
 }
 
