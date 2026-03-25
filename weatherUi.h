@@ -6,6 +6,8 @@
 #include <QString>
 class QScrollArea;
 class QHBoxLayout;
+class QLabel;
+class QTimer;
 class weatherAPI;
 class QPaintEvent;
 class QMouseEvent;
@@ -42,8 +44,7 @@ private slots:
 private:
     void setupUI();
     void rebuildWeatherCards();
-    void createDayCard(const QString &date, const QString &amIcon, const QString &amText, 
-                      const QString &pmIcon, const QString &pmText);
+    void scheduleRebuildCards();
 
     QScrollArea *scrollArea;
     QWidget *scrollContent;
@@ -52,6 +53,11 @@ private:
     weatherAPI *weatherService;
     QString backgroundImagePath;
     QVector<QVector<QString>> latestForecast;
+    QString currentCityName;
+    QString pendingCityName;
+    QLabel *errorTipLabel;
+    QTimer *errorTipTimer;
+    bool rebuildPending;
     Ui::WeatherUi *ui;
 };
 

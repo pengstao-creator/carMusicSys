@@ -8,7 +8,17 @@
 #include <QMediaPlayer>
 #include <QAudioOutput>
 #include <QSize>
+#include <QHash>
 
+namespace {
+QHash<QString, QPixmap> g_originalPixmapCache;
+QHash<QString, QPixmap> g_scaledPixmapCache;
+
+QString buildScaledCacheKey(const QString &path, const QSize &targetSize)
+{
+    return QString("%1|%2x%3").arg(path).arg(targetSize.width()).arg(targetSize.height());
+}
+}
 
 Player::Player(QObject *parent)
     : QObject(parent)
@@ -149,13 +159,45 @@ bool Player::showPlayer(PlayerType type)
 
 
 
-void Player::setupPixmap(const QString &path)
+void Player::setupPixmap(const QString &path, const QSize &targetSize)
 {
-    QPixmap pix(path);
-    if (pix.isNull()) {
+    m_currentPixmapPath = path;
+    applyCachedPixmap(path, targetSize);
+}
+
+void Player::refreshPixmap(const QSize &targetSize)
+{
+    if (m_currentPixmapPath.isEmpty()) {
         return;
     }
-    m_pixmapItem->setPixmap(pix);
+    applyCachedPixmap(m_currentPixmapPath, targetSize);
+}
+
+void Player::applyCachedPixmap(const QString &path, const QSize &targetSize)
+{
+    QPixmap originalPixmap;
+    if (g_originalPixmapCache.contains(path)) {
+        originalPixmap = g_originalPixmapCache.value(path);
+    } else {
+        originalPixmap = QPixmap(path);
+        if (originalPixmap.isNull()) {
+            return;
+        }
+        g_originalPixmapCache.insert(path, originalPixmap);
+    }
+
+    if (targetSize.isValid()) {
+        const QString cacheKey = buildScaledCacheKey(path, targetSize);
+        if (!g_scaledPixmapCache.contains(cacheKey)) {
+            g_scaledPixmapCache.insert(
+                cacheKey,
+                originalPixmap.scaled(targetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+        }
+        m_pixmapItem->setPixmap(g_scaledPixmapCache.value(cacheKey));
+        return;
+    }
+
+    m_pixmapItem->setPixmap(originalPixmap);
 }
 
 void Player::setupMovie(const QString &path)

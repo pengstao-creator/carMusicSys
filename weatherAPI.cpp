@@ -53,7 +53,6 @@ public:
         root["code"] = code;
         root["updateTime"] = updateTime;
         root["daily"] = daily;
-        qDebug() << "toJson" << __FILE__;
         return QJsonDocument(root).toJson();
     }
 
@@ -65,7 +64,6 @@ public:
         code = obj.value("code").toString();
         updateTime = obj.value("updateTime").toString();
         daily = obj.value("daily").toArray();
-        qDebug() << "fromJson" << __FILE__;
         return true;
     }
 };
@@ -180,10 +178,10 @@ void weatherAPI::onReplyFinished(QNetworkReply *reply)
             qDebug() << "Received data:" << data;
             parseweatherJson(data);
         } else {
-            qWarning() << "HTTP error, status code:" << statusCode;
+            emit requestFailed("请求天气服务失败");
         }
     } else {
-        qWarning() << "Network error:" << reply->errorString();
+        emit requestFailed("请求天气服务失败");
     }
     reply->deleteLater();
 }
@@ -213,7 +211,7 @@ void weatherAPI::onCitySearchFinished(QNetworkReply *reply)
             }
         }
     } else {
-        qWarning() << "City lookup network error:" << reply->errorString();
+        emit requestFailed("城市ID获取失败");
     }
     reply->deleteLater();
 }

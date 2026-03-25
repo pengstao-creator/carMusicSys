@@ -82,9 +82,10 @@ void desktop::getTime(QLabel* ymd, QLabel* hms)
 
 
 }
-
+#include <QThread>
 void desktop::on_weather_clicked()
 {
+    qDebug() << "on_weather_clicked" <<  QThread::currentThreadId();
     openSoft(carMusicSysconfig::APP_WEATHER);
 }
 

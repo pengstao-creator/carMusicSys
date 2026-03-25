@@ -25,7 +25,8 @@ public:
     explicit Player(QObject *parent = nullptr);
     ~Player();
     
-    void setupPixmap(const QString &path);   // 静态图片 
+    void setupPixmap(const QString &path, const QSize &targetSize);   // 静态图片
+    void refreshPixmap(const QSize &targetSize);
     void setupMovie(const QString &path);    // GIF
     void setupVideo(const QString &path);    // MP4
     void setWallpaperPlayer(const qreal z);
@@ -48,6 +49,7 @@ public:
     void setVideoSize(const QSize &size);
 
 private:
+    void applyCachedPixmap(const QString &path, const QSize &targetSize);
     std::unique_ptr<QGraphicsPixmapItem> m_pixmapItem;  // 静态图片项
     std::unique_ptr<QGraphicsVideoItem> m_videoItem;    // 视频项
     std::unique_ptr<QMovie> m_movie;                    // GIF播放器
@@ -56,6 +58,7 @@ private:
     std::unique_ptr<QAudioOutput> m_audioOutput;        // 音频输出
 
     PlayerType ptype;                                   // 当前播放器类型
+    QString m_currentPixmapPath;
 };
 
 #endif // PLAYER_H

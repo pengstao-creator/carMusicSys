@@ -1,5 +1,6 @@
 #include "softwarecontrol.h"
 #include "weatherUi.h"
+#include "Overlay.h"
 #include "zaxiscontrol.h"
 #include "Data.h"
 #include <QString>
@@ -18,11 +19,29 @@ void softwareControl::openSoft(const QString &softName)
 
 void softwareControl::openWeather()
 {
-    emit zAxisCtrl->wallpaperPause();
+    emit zAxisCtrl->wallpaperStop();
+    const auto &overlays = zAxisCtrl->getOvrlay();
+    if (overlays.contains(carMusicSysconfig::OVERLAY_WEATHER)) {
+        Overlay *overlay = overlays.value(carMusicSysconfig::OVERLAY_WEATHER);
+        if (overlay) {
+            overlay->setGeometry(zAxisCtrl->getQRect());
+            overlay->show();
+        }
+        return;
+    }
+
     auto weatherApp = new WeatherUi();
-    zAxisCtrl->addOverlay(carMusicSysconfig::OVERLAY_WEATHER,weatherApp);
-    connect(weatherApp,&WeatherUi::exit,this,[this]()
-            {
-        zAxisCtrl->wallpaperStart();
+    zAxisCtrl->addOverlay(carMusicSysconfig::OVERLAY_WEATHER, weatherApp);
+
+    connect(weatherApp,&WeatherUi::exit,this,[this](){
+        const auto &overlays = zAxisCtrl->getOvrlay();
+        if (overlays.contains(carMusicSysconfig::OVERLAY_WEATHER)) {
+            Overlay *overlay = overlays.value(carMusicSysconfig::OVERLAY_WEATHER);
+            if (overlay) {
+                overlay->hide();
+                emit zAxisCtrl->wallpaperStart();
+            }
+        }
     });
+
 }

@@ -24,6 +24,7 @@ HEADERS += Data.h \
            mainwindow.h \
            Overlay.h \
            Player.h \
+           musicui.h \
            softwarecontrol.h \
            wallpaerWidget.h \
            WallpaperLoad.h \
@@ -32,6 +33,7 @@ HEADERS += Data.h \
            zaxiscontrol.h
 
 FORMS += desktop.ui mainwindow.ui overlay.ui \
+    musicui.ui \
     weatherUi.ui
 
 SOURCES += desktop.cpp \
@@ -39,6 +41,7 @@ SOURCES += desktop.cpp \
            mainwindow.cpp \
            Overlay.cpp \
            Player.cpp \
+           musicui.cpp \
            softwarecontrol.cpp \
            wallpaerWidget.cpp \
            WallpaperLoad.cpp \

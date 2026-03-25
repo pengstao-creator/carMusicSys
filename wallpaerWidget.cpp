@@ -93,16 +93,14 @@ void wallpaerWidget::stop()
 
 void wallpaerWidget::play()
 {
-    qDebug() << "play";
     if(is_player_1)
     {
         m_player_1->play();
-        qDebug() << "1 --- play";
+
     }
     else
     {
         m_player_2->play();
-        qDebug() << "1 --- play";
     }
 }
 
@@ -150,7 +148,7 @@ void wallpaerWidget::setBackground(const QString &filePath1,Player * player)
 
     // 根据文件类型设置播放器
     if (suffix == "png" || suffix == "jpg" || suffix == "jpeg") {
-        player->setupPixmap(filePath1);
+        player->setupPixmap(filePath1, zAxis_Ctrl->getQRect().size().toSize());
         ptype = PlayerType::PIXMAP;
     } else if (suffix == "gif") {
         player->setupMovie(filePath1);
@@ -190,10 +188,8 @@ void wallpaerWidget::resizeEvent()
         // 调整图片项大小
         auto pixmapItem = player->getPixmapItem();
         if (pixmapItem) {
-            QPixmap pix = pixmapItem->pixmap();
-            if (!pix.isNull()) {
-                pixmapItem->setScale(qreal(zAxis_Ctrl->getQRect().width()) / pix.width());
-            }
+            player->refreshPixmap(zAxis_Ctrl->getQRect().size().toSize());
+            pixmapItem->setScale(1.0);
         }
     };
 

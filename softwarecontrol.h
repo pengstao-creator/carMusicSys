@@ -14,8 +14,6 @@ public:
 signals:
 private:
     void openWeather();
-
-
     zAxisControl * zAxisCtrl;
 };
 

@@ -33,7 +33,6 @@ public:
         if (!file.open(QIODevice::ReadOnly)) return false;
         QByteArray rawData = file.readAll();
         file.close();
-        qDebug() << "load" <<__FILE__;
         return data.fromJson(rawData);
     }
 

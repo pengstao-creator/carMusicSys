@@ -14,6 +14,9 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="rootLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -26,213 +29,198 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <property name="spacing">
-    <number>0</number>
-   </property>
    <item>
-    <widget class="QWidget" name="leftPanel">
-     <layout class="QGridLayout" name="leftGridLayout">
-      <property name="leftMargin">
-       <number>24</number>
-      </property>
-      <property name="topMargin">
-       <number>24</number>
-      </property>
-      <property name="rightMargin">
-       <number>24</number>
-      </property>
-      <property name="bottomMargin">
-       <number>24</number>
-      </property>
-      <property name="horizontalSpacing">
-       <number>16</number>
-      </property>
-      <property name="verticalSpacing">
-       <number>16</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="weather">
-        <property name="styleSheet">
-         <string notr="true">border-image: url(:/Resource/app/6.png);</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="QQMusic">
-        <property name="styleSheet">
-         <string notr="true">border-image: url(:/Resource/app/2.png);</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="amap">
-        <property name="styleSheet">
-         <string notr="true">border-image: url(:/Resource/app/4.png);</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="bilibili">
-        <property name="styleSheet">
-         <string notr="true">border-image: url(:/Resource/app/3.png);</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+    <layout class="QGridLayout" name="leftGridLayout">
+     <property name="leftMargin">
+      <number>24</number>
+     </property>
+     <property name="topMargin">
+      <number>24</number>
+     </property>
+     <property name="rightMargin">
+      <number>24</number>
+     </property>
+     <property name="bottomMargin">
+      <number>24</number>
+     </property>
+     <property name="spacing">
+      <number>16</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="weather">
+       <property name="styleSheet">
+        <string notr="true">border-image: url(:/Resource/app/6.png);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="QQMusic">
+       <property name="styleSheet">
+        <string notr="true">border-image: url(:/Resource/app/2.png);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="amap">
+       <property name="styleSheet">
+        <string notr="true">border-image: url(:/Resource/app/4.png);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="bilibili">
+       <property name="styleSheet">
+        <string notr="true">border-image: url(:/Resource/app/3.png);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QWidget" name="middlePanel">
-     <layout class="QVBoxLayout" name="middleVerticalLayout">
-      <property name="leftMargin">
-       <number>16</number>
-      </property>
-      <property name="topMargin">
-       <number>20</number>
-      </property>
-      <property name="rightMargin">
-       <number>16</number>
-      </property>
-      <property name="bottomMargin">
-       <number>20</number>
-      </property>
-      <property name="spacing">
-       <number>14</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="timeHmsLabel">
-        <property name="styleSheet">
-         <string notr="true">color: rgb(255, 255, 255);
+    <layout class="QVBoxLayout" name="middleVerticalLayout">
+     <property name="spacing">
+      <number>14</number>
+     </property>
+     <property name="leftMargin">
+      <number>16</number>
+     </property>
+     <property name="topMargin">
+      <number>20</number>
+     </property>
+     <property name="rightMargin">
+      <number>16</number>
+     </property>
+     <property name="bottomMargin">
+      <number>20</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="timeHmsLabel">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
 font: 700 34pt &quot;Segoe UI&quot;;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="text">
-         <string>00:00</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="timeYmdLabel">
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 220);
+       </property>
+       <property name="text">
+        <string>00:00</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="timeYmdLabel">
+       <property name="styleSheet">
+        <string notr="true">color: rgba(255, 255, 255, 220);
 font: 500 12pt &quot;Microsoft YaHei&quot;;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="text">
-         <string>01月-01日,周一</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="middleTopSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>12</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="middleApp1">
-        <property name="text">
-         <string>天气</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="middleApp2">
-        <property name="text">
-         <string>QQ音乐</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="middleBottomSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
+       </property>
+       <property name="text">
+        <string>01月-01日,周一</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="middleTopSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>12</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="middleApp1">
+       <property name="text">
+        <string>天气</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="middleApp2">
+       <property name="text">
+        <string>QQ音乐</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="middleBottomSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QWidget" name="rightPanel">
-     <layout class="QGridLayout" name="rightGridLayout">
-      <property name="leftMargin">
-       <number>24</number>
-      </property>
-      <property name="topMargin">
-       <number>24</number>
-      </property>
-      <property name="rightMargin">
-       <number>24</number>
-      </property>
-      <property name="bottomMargin">
-       <number>24</number>
-      </property>
-      <property name="horizontalSpacing">
-       <number>16</number>
-      </property>
-      <property name="verticalSpacing">
-       <number>16</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="rightApp1">
-        <property name="text">
-         <string>应用1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="rightApp2">
-        <property name="text">
-         <string>应用2</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="rightApp3">
-        <property name="text">
-         <string>应用3</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="rightApp4">
-        <property name="text">
-         <string>应用4</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+    <layout class="QGridLayout" name="rightGridLayout">
+     <property name="leftMargin">
+      <number>24</number>
+     </property>
+     <property name="topMargin">
+      <number>24</number>
+     </property>
+     <property name="rightMargin">
+      <number>24</number>
+     </property>
+     <property name="bottomMargin">
+      <number>24</number>
+     </property>
+     <property name="spacing">
+      <number>16</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="rightApp1">
+       <property name="text">
+        <string>应用1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="rightApp2">
+       <property name="text">
+        <string>应用2</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="rightApp3">
+       <property name="text">
+        <string>应用3</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="rightApp4">
+       <property name="text">
+        <string>应用4</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

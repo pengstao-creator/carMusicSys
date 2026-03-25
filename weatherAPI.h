@@ -23,7 +23,7 @@ public:
 
 signals:
     void weatherDataReady(const QVector<QVector<QString>> &weekForecast); // 数据就绪信号
-
+    void requestFailed(const QString& strerr);
 private slots:
     void onReplyFinished(QNetworkReply *reply); // 网络请求完成时的槽函数
     void onCitySearchFinished(QNetworkReply *reply); // 城市查询接口返回时的处理

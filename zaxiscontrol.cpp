@@ -25,8 +25,16 @@ QGraphicsScene *zAxisControl::getScene() const
     return m_scene;
 }
 
+Overlay *zAxisControl::getOverlay(const QString &name) const
+{
+    return m_overlay.value(name, nullptr);
+}
+
 void zAxisControl::addOverlay(const QString &name, QWidget *widget,bool is_transparent)
 {
+    if (m_overlay.contains(name)) {
+        return;
+    }
     addOvrlay({name,new Overlay});
     m_overlay[name]->addWidget(widget,is_transparent);
 }
@@ -35,7 +43,6 @@ void zAxisControl::addOvrlay(const std::pair<QString, Overlay *> &overlay)
 {
     auto _overlay = overlay.second;
     double LAYER_PALYER = Layer::LAYER_PLAYER_3 + m_overlay.size();
-    // 3. 创建透明覆盖层（一个空的 QGraphicsWidget）
     _overlay->setZValue(LAYER_PALYER);                     // 确保覆盖层在最上面
     _overlay->setGeometry(QRectF(0, 0,width(), height()));
     m_scene->addItem(_overlay);
@@ -44,7 +51,19 @@ void zAxisControl::addOvrlay(const std::pair<QString, Overlay *> &overlay)
 
 void zAxisControl::erase(const QString &name)
 {
-    m_overlay.erase(m_overlay.find(name));
+    auto it = m_overlay.find(name);
+    if (it == m_overlay.end()) {
+        return;
+    }
+    Overlay *overlay = it.value();
+    m_overlay.erase(it);
+    if (!overlay) {
+        return;
+    }
+    if (m_scene) {
+        m_scene->removeItem(overlay);
+    }
+    delete overlay;
 }
 
 QRectF zAxisControl::getQRect() const
@@ -61,7 +80,7 @@ void zAxisControl::setBaseQWidget()
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setRenderHint(QPainter::Antialiasing);        // 抗锯齿
-    setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // 避免残影
+    setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
     setRenderHint(QPainter::SmoothPixmapTransform); // 平滑缩放
     setAlignment(Qt::AlignCenter);
     // 3. 设置背景色（默认黑色）
