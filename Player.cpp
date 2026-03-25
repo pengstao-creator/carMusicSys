@@ -29,6 +29,7 @@ Player::Player(QObject *parent)
     , m_mediaPlayer(std::make_unique<QMediaPlayer>())
     , m_audioOutput(std::make_unique<QAudioOutput>())
     , ptype(PlayerType::NONPLAYER)
+    , m_lastVideoSize()
 {
 }
 
@@ -161,6 +162,7 @@ bool Player::showPlayer(PlayerType type)
 
 void Player::setupPixmap(const QString &path, const QSize &targetSize)
 {
+    ptype = PlayerType::PIXMAP;
     m_currentPixmapPath = path;
     applyCachedPixmap(path, targetSize);
 }
@@ -202,6 +204,7 @@ void Player::applyCachedPixmap(const QString &path, const QSize &targetSize)
 
 void Player::setupMovie(const QString &path)
 {
+    ptype = PlayerType::MOVIE;
     m_movie->setFileName(path);
     if (!m_movie->isValid()) {
         return;
@@ -215,14 +218,17 @@ void Player::setupMovie(const QString &path)
 
 void Player::setupVideo(const QString &path)
 {
+    ptype = PlayerType::VIDEO;
+    m_lastVideoSize = QSize();
     m_mediaPlayer->setSource(QUrl::fromLocalFile(path));
     m_mediaPlayer->play();
 }
 
 void Player::setVideoSize(const QSize &size)
 {
-    if (m_videoItem) {
-        m_videoItem->setAspectRatioMode(Qt::KeepAspectRatioByExpanding);
-        m_videoItem->setSize(size);
-    }
+    if (!m_videoItem || !size.isValid()) return;
+    if (m_lastVideoSize == size) return;
+    m_videoItem->setAspectRatioMode(Qt::KeepAspectRatioByExpanding);
+    m_videoItem->setSize(size);
+    m_lastVideoSize = size;
 }

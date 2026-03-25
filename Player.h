@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include <QObject>
+#include <QSize>
 #include <memory>
 class QString;
 class QGraphicsPixmapItem;
@@ -9,7 +10,6 @@ class QGraphicsVideoItem;
 class QMovie;
 class QMediaPlayer;
 class QAudioOutput;
-class QSize;
 
 enum class PlayerType {
     NONPLAYER,
@@ -59,6 +59,7 @@ private:
 
     PlayerType ptype;                                   // 当前播放器类型
     QString m_currentPixmapPath;
+    QSize m_lastVideoSize;
 };
 
 #endif // PLAYER_H

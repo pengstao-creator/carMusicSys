@@ -45,15 +45,8 @@ void wallpaerWidget::setPlayer()
         connect(player->getMediaPlayer(), &QMediaPlayer::mediaStatusChanged, this,
                 [this, player](QMediaPlayer::MediaStatus status) {
                     if (status == QMediaPlayer::LoadedMedia || status == QMediaPlayer::BufferedMedia) {
-                        auto videoItem = player->getVideoItem();
-                        QSizeF videoSize = videoItem->nativeSize();
-                        if (videoSize.isValid()) {
-                            // 设置宽高比模式
-                            videoItem->setAspectRatioMode(Qt::KeepAspectRatioByExpanding);
-                            // 然后设置目标矩形仍为视图大小
-                            videoItem->setSize(zAxis_Ctrl->getQRect().size());
-                        }
-
+                        const auto targetSize = zAxis_Ctrl->getQRect().size().toSize();
+                        player->setVideoSize(targetSize);
                     }
                 });
     };
@@ -171,24 +164,24 @@ const QString &wallpaerWidget::getFile() const
 
 void wallpaerWidget::resizeEvent()
 {
-    // 调整两个播放器的视频项和图片项大小
+    const auto targetSize = zAxis_Ctrl->getQRect().size().toSize();
+    if (!targetSize.isValid()) {
+        return;
+    }
+    if (m_lastSceneSize == targetSize) {
+        return;
+    }
+    m_lastSceneSize = targetSize;
+
     auto adjustPlayer = [this](Player* player) {
         if (!player) return;
-
-        // 调整视频项大小
-        auto videoItem = player->getVideoItem();
-        if (videoItem) {
-            // 设置宽高比模式
-            videoItem->setAspectRatioMode(Qt::KeepAspectRatioByExpanding);
-            // 然后设置目标矩形仍为视图大小
-            videoItem->setSize(zAxis_Ctrl->getQRect().size());
-
-        }
-
-        // 调整图片项大小
-        auto pixmapItem = player->getPixmapItem();
-        if (pixmapItem) {
-            player->refreshPixmap(zAxis_Ctrl->getQRect().size().toSize());
+        const auto type = player->getCurrentPlayerType();
+        if (type == PlayerType::VIDEO) {
+            player->setVideoSize(m_lastSceneSize);
+        } else if (type == PlayerType::PIXMAP) {
+            auto pixmapItem = player->getPixmapItem();
+            if (!pixmapItem) return;
+            player->refreshPixmap(m_lastSceneSize);
             pixmapItem->setScale(1.0);
         }
     };

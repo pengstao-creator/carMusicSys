@@ -1,5 +1,6 @@
 #include "zaxiscontrol.h"
 #include <QHash>
+#include <QOpenGLWidget>
 #include "Data.h"
 #include "Overlay.h"
 zAxisControl::zAxisControl(QWidget *parent)
@@ -75,12 +76,15 @@ void zAxisControl::setBaseQWidget()
 {
     //1.创建场景
     setScene(m_scene);
+    setViewport(new QOpenGLWidget(this));
     // 2. 设置视图属性
     setFrameStyle(QFrame::NoFrame);               // 无边框
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setRenderHint(QPainter::Antialiasing);        // 抗锯齿
-    setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+    setRenderHint(QPainter::Antialiasing, false);
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    setOptimizationFlag(QGraphicsView::DontSavePainterState, true);
+    setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing, true);
     setRenderHint(QPainter::SmoothPixmapTransform); // 平滑缩放
     setAlignment(Qt::AlignCenter);
     // 3. 设置背景色（默认黑色）

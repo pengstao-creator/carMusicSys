@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QSize>
 #include <memory>
 
 //前置声明,防止头文件循环包含和减少编译依赖，加快编译速度
@@ -36,5 +37,6 @@ private:
     bool is_player_1;
     PlayerType ptype;
     QString m_currentFile;              // 当前文件路径
+    QSize m_lastSceneSize;
 };
 #endif // WALLPAERWIDGET_H

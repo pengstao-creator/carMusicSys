@@ -29,7 +29,8 @@ int main(int argc, char *argv[])
     
     // // 禁用所有Qt日志输出
     // QLoggingCategory::setFilterRules("*.debug=false\n*.info=false\n*.warning=false\n*.critical=false");
-    qputenv("QT_MULTIMEDIA_PREFERRED_PLUGINS", "windows"); // 直接覆盖环境变量
+    qputenv("QT_MULTIMEDIA_PREFERRED_PLUGINS", "ffmpeg,windows");
+    qputenv("QT_FFMPEG_DECODING_HW_DEVICE_TYPES", "d3d11va,dxva2");
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
