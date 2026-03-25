@@ -85,7 +85,7 @@ void zAxisControl::setBaseQWidget()
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setOptimizationFlag(QGraphicsView::DontSavePainterState, true);
     setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing, true);
-    setRenderHint(QPainter::SmoothPixmapTransform); // 平滑缩放
+    setRenderHint(QPainter::SmoothPixmapTransform, false);
     setAlignment(Qt::AlignCenter);
     // 3. 设置背景色（默认黑色）
     setBackgroundBrush(Qt::black);

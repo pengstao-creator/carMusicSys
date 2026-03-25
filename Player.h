@@ -59,6 +59,7 @@ private:
 
     PlayerType ptype;                                   // 当前播放器类型
     QString m_currentPixmapPath;
+    QString m_currentVideoPath;
     QSize m_lastVideoSize;
 };
 

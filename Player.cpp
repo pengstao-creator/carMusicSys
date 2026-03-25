@@ -60,6 +60,8 @@ void Player::setVideoPlayer(const qreal z)
 {
     // 设置视频输出到该图形项
     m_videoItem->setZValue(z);
+    m_audioOutput->setMuted(true);
+    m_audioOutput->setVolume(0.0);
     m_mediaPlayer->setAudioOutput(m_audioOutput.get());    // Qt6 方式连接音频
     m_mediaPlayer->setVideoOutput(m_videoItem.get());
 
@@ -219,6 +221,11 @@ void Player::setupMovie(const QString &path)
 void Player::setupVideo(const QString &path)
 {
     ptype = PlayerType::VIDEO;
+    if (m_currentVideoPath == path) {
+        m_mediaPlayer->play();
+        return;
+    }
+    m_currentVideoPath = path;
     m_lastVideoSize = QSize();
     m_mediaPlayer->setSource(QUrl::fromLocalFile(path));
     m_mediaPlayer->play();

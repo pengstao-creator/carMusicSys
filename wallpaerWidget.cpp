@@ -62,7 +62,7 @@ wallpaerWidget::~wallpaerWidget()
 void wallpaerWidget::setPathFirst(const QString &filePath1, const QString &filePath2)
 {
     setBackground(filePath1,m_player_1.get());
-    m_player_1->showPlayer(ptype);
+    m_player_1->showPlayer(m_player_1->getCurrentPlayerType());
     setBackground(filePath2,m_player_2.get());
     m_player_2->hidePlayer(PlayerType::NONPLAYER);
     // 设置当前文件名为第二个文件的文件名
@@ -112,24 +112,21 @@ void wallpaerWidget::pause()
 
 void wallpaerWidget::setPath(const QString &filePath)
 {
-    if(is_player_1)
-    {
-        m_player_2->showPlayer(ptype);
-
-        setBackground(filePath,m_player_1.get());
-        m_player_1->hidePlayer(PlayerType::NONPLAYER);
-        is_player_1 = false;
-    }
-    else
-    {
-        m_player_1->showPlayer(ptype);
-
-        setBackground(filePath,m_player_2.get());
-        m_player_2->hidePlayer(PlayerType::NONPLAYER);
-        is_player_1 = true;
-    }
-    // 只存储文件名，而不是完整路径
     QFileInfo info(filePath);
+    if (m_currentFile == info.fileName()) {
+        return;
+    }
+
+    Player* currentPlayer = is_player_1 ? m_player_1.get() : m_player_2.get();
+    Player* standbyPlayer = is_player_1 ? m_player_2.get() : m_player_1.get();
+
+    standbyPlayer->showPlayer(standbyPlayer->getCurrentPlayerType());
+    currentPlayer->hidePlayer(PlayerType::NONPLAYER);
+
+    setBackground(filePath, currentPlayer);
+    currentPlayer->hidePlayer(PlayerType::NONPLAYER);
+    is_player_1 = !is_player_1;
+    // 只存储文件名，而不是完整路径
     m_currentFile = info.fileName();
 
 }
