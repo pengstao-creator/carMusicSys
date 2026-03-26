@@ -10,6 +10,8 @@ class musicUi;
 class musicUi : public QWidget
 {
     Q_OBJECT
+signals :
+    void exit();
 
 public:
     explicit musicUi(QWidget *parent = nullptr);

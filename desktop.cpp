@@ -109,7 +109,7 @@ void desktop::on_bilibili_clicked()
 
 void desktop::openSoft(const QString &softName)
 {
-    softCtrl->openSoft(softName);
+    softCtrl->openSoftware(softName);
 }
 
 void desktop::setupButtonBaseStyle()

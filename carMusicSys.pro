@@ -43,6 +43,7 @@ SOURCES += desktop.cpp \
            Player.cpp \
            musicui.cpp \
            softwarecontrol.cpp \
+           softwarecontrol.cpp \
            wallpaerWidget.cpp \
            WallpaperLoad.cpp \
            weatherAPI.cpp \

@@ -108,27 +108,27 @@ bool Player::hidePlayer(PlayerType type)
 {
     if(type == PlayerType::VIDEO)
     {
-        m_mediaPlayer->pause();//清除视频资源，黑屏显示，播放位置重置为0
-        m_videoItem->setVisible(false);//设置隐藏
+        if(m_mediaPlayer)m_mediaPlayer->pause();//清除视频资源，黑屏显示，播放位置重置为0
+        if(m_videoItem)m_videoItem->setVisible(false);//设置隐藏
 
     }
     else if(type == PlayerType::PIXMAP )
     {
-        m_pixmapItem->hide();
+        if(m_pixmapItem)m_pixmapItem->hide();
     }
     else if(type == PlayerType::MOVIE)
     {
-        m_MovieItem->hide();
-        m_movie->stop();
+        if(m_MovieItem)m_MovieItem->hide();
+        if(m_movie)m_movie->stop();
     }
     else if(type == PlayerType::NONPLAYER)
     {
         // 隐藏所有类型的播放器
-        m_mediaPlayer->pause();
-        m_videoItem->setVisible(false);
-        m_pixmapItem->hide();
-        m_MovieItem->hide();
-        m_movie->stop();
+        if(m_mediaPlayer)m_mediaPlayer->pause();
+        if(m_videoItem)m_videoItem->setVisible(false);
+        if(m_pixmapItem)m_pixmapItem->hide();
+        if(m_MovieItem)m_MovieItem->hide();
+        if(m_movie)m_movie->stop();
     }
     else
     {
@@ -141,17 +141,17 @@ bool Player::showPlayer(PlayerType type)
 {
     if(type == PlayerType::VIDEO)
     {
-        m_videoItem->setVisible(true);//展示
-        m_mediaPlayer->play();
+        if(m_videoItem)m_videoItem->setVisible(true);//展示
+        if(m_mediaPlayer)m_mediaPlayer->play();
     }
     else if(type == PlayerType::PIXMAP)
     {
-        m_pixmapItem->show();
+        if(m_pixmapItem)m_pixmapItem->show();
     }
     else if (type == PlayerType::MOVIE)
     {
-        m_MovieItem->show();
-        m_movie->start();
+        if(m_MovieItem)m_MovieItem->show();
+        if(m_movie)m_movie->start();    
     }
     else
     {
