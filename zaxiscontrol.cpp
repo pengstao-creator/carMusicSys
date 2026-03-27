@@ -1,8 +1,13 @@
 #include "zaxiscontrol.h"
 #include <QHash>
-#include <QOpenGLWidget>
 #include "Data.h"
 #include "Overlay.h"
+#include <QDebug>
+
+// 条件编译以支持Qt5
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QOpenGLWidget>
+#endif
 zAxisControl::zAxisControl(QWidget *parent)
     : QGraphicsView(parent)
     , m_scene(new QGraphicsScene(this))
@@ -12,6 +17,7 @@ zAxisControl::zAxisControl(QWidget *parent)
 
 zAxisControl::~zAxisControl()
 {
+    qDebug() << "zAxisControl::dtor overlays" << m_overlay.keys();
     // 清理资源
     qDeleteAll(m_overlay.values());
 }
@@ -33,6 +39,7 @@ Overlay *zAxisControl::getOverlay(const QString &name) const
 
 void zAxisControl::addOverlay(const QString &name, QWidget *widget,bool is_transparent)
 {
+    qDebug() << "zAxisControl::addOverlay" << name << "widget" << widget << "transparent" << is_transparent;
     if (m_overlay.contains(name)) {
         return;
     }
@@ -42,6 +49,7 @@ void zAxisControl::addOverlay(const QString &name, QWidget *widget,bool is_trans
 
 void zAxisControl::addOvrlay(const std::pair<QString, Overlay *> &overlay)
 {
+    qDebug() << "zAxisControl::addOvrlay" << overlay.first << overlay.second;
     auto _overlay = overlay.second;
     double LAYER_PALYER = Layer::LAYER_PLAYER_3 + m_overlay.size();
     _overlay->setZValue(LAYER_PALYER);                     // 确保覆盖层在最上面
@@ -52,6 +60,7 @@ void zAxisControl::addOvrlay(const std::pair<QString, Overlay *> &overlay)
 
 void zAxisControl::erase(const QString &name)
 {
+    qDebug() << "zAxisControl::erase" << name;
     auto it = m_overlay.find(name);
     if (it == m_overlay.end()) {
         return;
@@ -76,15 +85,25 @@ void zAxisControl::setBaseQWidget()
 {
     //1.创建场景
     setScene(m_scene);
+    
+    // 条件编译以支持Qt5
+    #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     setViewport(new QOpenGLWidget(this));
+    #endif
+    
     // 2. 设置视图属性
     setFrameStyle(QFrame::NoFrame);               // 无边框
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setRenderHint(QPainter::Antialiasing, false);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    
+    // 条件编译以支持Qt5
+    #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     setOptimizationFlag(QGraphicsView::DontSavePainterState, true);
     setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing, true);
+    #endif
+    
     setRenderHint(QPainter::SmoothPixmapTransform, false);
     setAlignment(Qt::AlignCenter);
     // 3. 设置背景色（默认黑色）

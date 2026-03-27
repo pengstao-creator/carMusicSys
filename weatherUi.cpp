@@ -15,6 +15,11 @@
 #include <QScrollArea>
 #include <QSvgRenderer>
 #include <QTimer>
+#include <QFileInfo>
+#include <QImageReader>
+#include <QPalette>
+#include <QBrush>
+#include <QDebug>
 #include <QtGlobal>
 #include <QVBoxLayout>
 
@@ -52,11 +57,16 @@ WeatherUi::WeatherUi(QWidget *parent) : QWidget(parent)
     , weatherService(new weatherAPI(this))
     , currentCityName(QString::fromUtf8(carMusicSysconfig::DEFAULT_CITY))
     , errorTipLabel(nullptr)
+    , backgroundLabel(nullptr)
     , errorTipTimer(new QTimer(this))
     , rebuildPending(false)
     , ui(new Ui::WeatherUi)
 {
+    qDebug() << "WeatherUi::ctor" << this << "parent" << parent;
     setupUI();
+    // 天气页背景加载入口：
+    // 优先使用配置项 WEATHER_BACKGROUND（当前为 7.png），
+    // 若运行环境无法解码 PNG，会在 setBackground 内自动回退到 5.jpg。
     const QString backgroundPath = QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH)
                                  + QString::fromUtf8(carMusicSysconfig::WEATHER_BACKGROUND);
     setBackground(backgroundPath);
@@ -91,6 +101,7 @@ WeatherUi::WeatherUi(QWidget *parent) : QWidget(parent)
 
 WeatherUi::~WeatherUi()
 {
+    qDebug() << "WeatherUi::dtor" << this;
     delete ui;
 }
 
@@ -101,6 +112,15 @@ void WeatherUi::setupUI()
     resize(kBaseWindowWidth, kBaseWindowHeight);
     // 设置窗口对象名，用于样式表
     setObjectName("weatherMainWidget");
+    setAttribute(Qt::WA_StyledBackground, true);
+    // 增加一层底图 QLabel（放在最底层）：
+    // 在 Qt5 + QGraphicsProxyWidget 场景中，纯样式背景可能被视口/子控件覆盖，
+    // 因此使用真实像素层作为第一重保障。
+    backgroundLabel = new QLabel(this);
+    backgroundLabel->setGeometry(rect());
+    backgroundLabel->setScaledContents(false);
+    backgroundLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    backgroundLabel->lower();
 
     // 获取UI中的滚动区域、内容容器和卡片布局
     scrollArea = ui->weatherScrollArea;
@@ -115,6 +135,16 @@ void WeatherUi::setupUI()
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         // 禁用垂直滚动条
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        scrollArea->setFrameShape(QFrame::NoFrame);
+        // 将滚动区域与 viewport 设为透明，避免遮住底图层。
+        // 否则天气卡片之外的区域可能被默认底色填充。
+        scrollArea->setAutoFillBackground(false);
+        scrollArea->setAttribute(Qt::WA_TranslucentBackground, true);
+        if (scrollArea->viewport()) {
+            scrollArea->viewport()->setAutoFillBackground(false);
+            scrollArea->viewport()->setAttribute(Qt::WA_TranslucentBackground, true);
+            scrollArea->viewport()->setStyleSheet("background: transparent;");
+        }
     }
     
     
@@ -240,6 +270,22 @@ void WeatherUi::rebuildWeatherCards()
 void WeatherUi::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+    if (backgroundLabel) {
+        backgroundLabel->setGeometry(rect());
+    }
+    // 尺寸变化时同步刷新两套背景：
+    // 1) backgroundLabel 实图层；
+    // 2) QPalette::Window 画刷层（Qt5 下对某些风格更稳定）。
+    if (!backgroundPixmap.isNull()) {
+        const QPixmap scaled = backgroundPixmap.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        if (backgroundLabel) {
+            backgroundLabel->setPixmap(scaled);
+        }
+        QPalette pal = palette();
+        pal.setBrush(QPalette::Window, QBrush(scaled));
+        setPalette(pal);
+        setAutoFillBackground(true);
+    }
     if (errorTipLabel && errorTipLabel->isVisible()) {
         errorTipLabel->move((width() - errorTipLabel->width()) / 2, 8);
     }
@@ -250,7 +296,51 @@ void WeatherUi::resizeEvent(QResizeEvent *event)
 
 void WeatherUi::setBackground(const QString &backgroundPath)
 {
+    // 背景加载策略：
+    // - 首选配置背景（通常是 7.png）；
+    // - 若 QPixmap 为空（例如 Qt5 缺少 qpng 插件），自动回退到 5.jpg；
+    // - 同时将最终可用图设置到 label + palette + stylesheet，三重兜底。
     backgroundImagePath = backgroundPath;
+    backgroundPixmap = QPixmap(backgroundImagePath);
+    if (backgroundPixmap.isNull()) {
+        // 回退背景用于保证“至少可见”：
+        // 即便 PNG 解码失败，天气页依然有背景，不影响主流程体验。
+        const QString fallbackPath = QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "7.jpg";
+        backgroundPixmap = QPixmap(fallbackPath);
+        if (!backgroundPixmap.isNull()) {
+            backgroundImagePath = fallbackPath;
+        }
+    }
+    if (backgroundLabel) {
+        if (!backgroundPixmap.isNull()) {
+            const QPixmap scaled = backgroundPixmap.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+            backgroundLabel->setPixmap(scaled);
+            QPalette pal = palette();
+            pal.setBrush(QPalette::Window, QBrush(scaled));
+            setPalette(pal);
+            setAutoFillBackground(true);
+        } else {
+            backgroundLabel->setPixmap(QPixmap());
+            setAutoFillBackground(false);
+        }
+    }
+    // 样式层仍保留，主要用于统一圆角卡片之外区域的绘制行为。
+    const QString style = QString(
+        "#weatherMainWidget {"
+        "background-image: url(%1);"
+        "background-position: center;"
+        "background-repeat: no-repeat;"
+        "}"
+        "QScrollArea { background: transparent; border: none; }"
+        "QScrollArea > QWidget > QWidget { background: transparent; }")
+        .arg(backgroundImagePath);
+    setStyleSheet(style);
+    // 关键诊断日志：
+    // exists=true 但 pixmapNull=true 通常意味着运行时图像解码插件缺失。
+    qDebug() << "WeatherUi::setBackground" << backgroundImagePath << "exists" << QFileInfo(backgroundImagePath).exists() << "pixmapNull" << backgroundPixmap.isNull() << "size" << backgroundPixmap.size();
+    if (backgroundPixmap.isNull()) {
+        qDebug() << "WeatherUi::imageFormats" << QImageReader::supportedImageFormats();
+    }
     update();
 }
 
@@ -290,12 +380,14 @@ void WeatherUi::mouseReleaseEvent(QMouseEvent *event)
 
 void WeatherUi::on_exitButton_clicked()
 {
+    qDebug() << "WeatherUi::on_exitButton_clicked" << this;
     close();
     emit exit();
 }
 
 void WeatherUi::on_searchButton_clicked()
 {
+    qDebug() << "WeatherUi::on_searchButton_clicked" << this;
     // 切换搜索面板的可见状态
     ui->searchButton->hide();
     const bool show = !ui->searchPanel->isVisible();
@@ -309,6 +401,7 @@ void WeatherUi::on_searchButton_clicked()
 
 void WeatherUi::on_confirmSearchButton_clicked()
 {
+    qDebug() << "WeatherUi::on_confirmSearchButton_clicked" << this;
     // 检查城市输入框是否存在
     if (!ui->cityLineEdit) {
         return;

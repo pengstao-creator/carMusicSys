@@ -12,6 +12,7 @@
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QSizePolicy>
+#include <QDebug>
 desktop::desktop(zAxisControl * zAxis_Ctrl,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::desktop)
@@ -83,26 +84,41 @@ void desktop::getTime(QLabel* ymd, QLabel* hms)
 
 }
 #include <QThread>
-void desktop::on_weather_clicked()
+void desktop::on_leftApp1_clicked()
 {
     qDebug() << "on_weather_clicked" <<  QThread::currentThreadId();
     openSoft(carMusicSysconfig::APP_WEATHER);
 }
 
 
-void desktop::on_QQMusic_clicked()
+void desktop::on_leftApp2_clicked()
 {
     openSoft(carMusicSysconfig::APP_QQMUSIC);
 }
 
 
-void desktop::on_amap_clicked()
+void desktop::on_leftApp3_clicked()
 {
     openSoft(carMusicSysconfig::APP_AMAP);
 }
 
 
-void desktop::on_bilibili_clicked()
+void desktop::on_leftApp4_clicked()
+{
+    openSoft(carMusicSysconfig::APP_BILIBILI);
+}
+
+void desktop::on_rightApp1_clicked()
+{
+    openSoft(carMusicSysconfig::APP_SETTING);
+}
+
+void desktop::on_rightApp2_clicked()
+{
+    openSoft(carMusicSysconfig::APP_AMAP);
+}
+
+void desktop::on_rightApp3_clicked()
 {
     openSoft(carMusicSysconfig::APP_BILIBILI);
 }
@@ -129,10 +145,18 @@ void desktop::setupIconButtons()
     ui->leftGridLayout->setColumnStretch(0, 1);
     ui->leftGridLayout->setColumnStretch(1, 1);
 
-    const QList<QPushButton*> iconButtons = { ui->weather, ui->QQMusic, ui->amap, ui->bilibili };
+    ui->rightGridLayout->setRowStretch(0, 1);
+    ui->rightGridLayout->setRowStretch(1, 1);
+    ui->rightGridLayout->setColumnStretch(0, 1);
+    ui->rightGridLayout->setColumnStretch(1, 1);
+
+    const QList<QPushButton*> iconButtons = { ui->leftApp1, ui->leftApp2, ui->leftApp3, ui->leftApp4, ui->rightApp1, ui->rightApp2, ui->rightApp3 };
     const QList<QString> iconPaths = {
         QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "6.png",
         QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "2.png",
+        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "4.png",
+        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "3.png",
+        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "10.png",
         QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "4.png",
         QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "3.png"
     };
@@ -156,7 +180,7 @@ void desktop::setupIconButtons()
 
 void desktop::updateIconButtonSizes()
 {
-    const QList<QPushButton*> iconButtons = { ui->weather, ui->QQMusic, ui->amap, ui->bilibili };
+    const QList<QPushButton*> iconButtons = { ui->leftApp1, ui->leftApp2, ui->leftApp3, ui->leftApp4, ui->rightApp1, ui->rightApp2, ui->rightApp3 };
     for (QPushButton *button : iconButtons) {
         const int side = qMax(24, qMin(button->width(), button->height()) - 16);
         button->setIconSize(QSize(side, side));

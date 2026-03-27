@@ -27,13 +27,16 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void on_weather_clicked();
+    void on_leftApp1_clicked();
 
-    void on_QQMusic_clicked();
+    void on_leftApp2_clicked();
 
-    void on_amap_clicked();
+    void on_leftApp3_clicked();
 
-    void on_bilibili_clicked();
+    void on_leftApp4_clicked();
+    void on_rightApp1_clicked();
+    void on_rightApp2_clicked();
+    void on_rightApp3_clicked();
 
 private:
     void openSoft(const QString& softName);

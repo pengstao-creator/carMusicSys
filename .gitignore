@@ -3,6 +3,7 @@ Resource/
 Weather/
 Wallpaper/
 build/
+Music/
 *.pro.user
 *.pro.user.*
 *.qmake.stash

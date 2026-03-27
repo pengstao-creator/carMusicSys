@@ -2,7 +2,6 @@
 #define WALLPAPERLOAD_H
 #include <QObject>
 #include <QStringList>
-#include <memory>
 class QTimer;
 class wallpaerWidget;
 class zAxisControl;
@@ -23,8 +22,8 @@ private slots:
 
 private:
     time_t _stime;
-    std::unique_ptr<QTimer> _switchTime;//切换壁纸的时间
-    std::unique_ptr<wallpaerWidget> _wallpaper;//外部初始化，以为需要其的父对象为QMainWindow
+    QTimer *_switchTime;
+    wallpaerWidget *_wallpaper;
     QStringList _wallpapers;
     QString _path;
     zAxisControl * zAxisCtrl;

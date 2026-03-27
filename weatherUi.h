@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVector>
 #include <QString>
+#include <QPixmap>
 class QScrollArea;
 class QHBoxLayout;
 class QLabel;
@@ -56,6 +57,8 @@ private:
     QString currentCityName;
     QString pendingCityName;
     QLabel *errorTipLabel;
+    QLabel *backgroundLabel;
+    QPixmap backgroundPixmap;
     QTimer *errorTipTimer;
     bool rebuildPending;
     Ui::WeatherUi *ui;

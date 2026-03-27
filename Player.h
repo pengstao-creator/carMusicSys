@@ -9,7 +9,11 @@ class QGraphicsPixmapItem;
 class QGraphicsVideoItem;
 class QMovie;
 class QMediaPlayer;
+
+// 条件编译以支持Qt5
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 class QAudioOutput;
+#endif
 
 enum class PlayerType {
     NONPLAYER,
@@ -33,6 +37,7 @@ public:
     void setPixmapPlayer(const qreal z);
     void setVideoPlayer(const qreal z);
     void setMoviePlayer(const qreal z);
+    void setAudioPlayer();
     void pause();
     void stop();
     void play();
@@ -55,12 +60,17 @@ private:
     std::unique_ptr<QMovie> m_movie;                    // GIF播放器
     std::unique_ptr<QGraphicsPixmapItem> m_MovieItem;    //gif图片展示
     std::unique_ptr<QMediaPlayer> m_mediaPlayer;        // 视频播放器
+    // 条件编译以支持Qt5
+    #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     std::unique_ptr<QAudioOutput> m_audioOutput;        // 音频输出
+    #endif
 
     PlayerType ptype;                                   // 当前播放器类型
     QString m_currentPixmapPath;
     QString m_currentVideoPath;
     QSize m_lastVideoSize;
+    bool m_videoSignalsConnected;
+    bool m_movieSignalsConnected;
 };
 
 #endif // PLAYER_H

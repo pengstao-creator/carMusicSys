@@ -513,8 +513,10 @@
         <file>Resource/weatherIcons/9999.svg</file>
         <file>Resource/weatherIcons/qweather.svg</file>
         <file>Resource/weatherIcons/qweather-fill.svg</file>
-        <file>Resource/app/7.png</file>
         <file>Resource/app/8.svg</file>
         <file>Resource/app/9.svg</file>
+        <file>Resource/app/7.jpg</file>
+        <file>Resource/app/10.png</file>
+        <file>Resource/app/11.jpg</file>
     </qresource>
 </RCC>
