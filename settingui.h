@@ -1,22 +1,24 @@
 #ifndef SETTINGUI_H
 #define SETTINGUI_H
 
-#include <QWidget>
+#include "softwareuibase.h"
+class QPixmap;
+class QString;
 
 namespace Ui {
 class settingUi;
 }
 
-class settingUi : public QWidget
+class settingUi : public softwareUiBase
 {
     Q_OBJECT
 
 public:
     explicit settingUi(QWidget *parent = nullptr);
     ~settingUi();
-
-signals:
-    void exit();
+    static const QString &getSoftname();
+    static const QPixmap &getSofticon();
+    static softwareUiBase *getSingleton();
 
 private slots:
     void on_exitButton_clicked();

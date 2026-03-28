@@ -1,6 +1,5 @@
 #include "weatherAPI.h"
 #include "CacheManager.hpp"
-#include "Data.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QJsonDocument>
@@ -20,16 +19,32 @@
 #include <QFileInfo>
 
 namespace {
-const QString kDefaultCityId = QString::fromUtf8(carMusicSysconfig::DEFAULT_CITY_ID);
-const QString kCityLookupPrefix = QString::fromUtf8(carMusicSysconfig::CITY_LOOKUP_KEY_PREFIX);
+constexpr const char *kCacheDataBase = "cacheData";
+constexpr const char *kWeatherApiKey = "f909afa4e64542abb2920be08d0f2995";
+constexpr const char *kWeatherIconPath = ":/Resource/weatherIcons/";
+constexpr const char *kIconUseFill = "";
+constexpr const char *kDefaultCityIdRaw = "101270101";
+constexpr const char *kCityLookupKeyPrefixRaw = "city_lookup_";
+constexpr const char *kWeatherApi7dUrl = "https://n36cdphw5g.re.qweatherapi.com/v7/weather/7d?location=%1&key=%2";
+constexpr const char *kWeatherCityLookupUrl = "https://n36cdphw5g.re.qweatherapi.com/geo/v2/city/lookup?location=%1&key=%2";
+constexpr const char *kRequestTypeKey = "requestType";
+constexpr const char *kRequestTypeWeather = "weather";
+constexpr const char *kRequestTypeCityLookup = "cityLookup";
+constexpr const char *kRequestCityIdKey = "cityId";
+constexpr const char *kRequestCityNameKey = "cityName";
+constexpr const char *kApiCodeOk = "200";
+constexpr int kHttpStatusOk = 200;
+constexpr int kWeatherTimeoutHours = 6;
+const QString kDefaultCityId = QString::fromUtf8(kDefaultCityIdRaw);
+const QString kCityLookupPrefix = QString::fromUtf8(kCityLookupKeyPrefixRaw);
 }
 
 weatherAPI::weatherAPI(QObject *parent)
     : QObject(parent)
     , cacheData(std::make_unique<CacheManager<WeatherData>>(
-          carMusicSysconfig::CACHEDATA_BASE, carMusicSysconfig::WEAATHER_TIMEOUT_H))
+          kCacheDataBase, kWeatherTimeoutHours))
     , cityLookupCacheData(std::make_unique<CacheManager<CityLookupData>>(
-          carMusicSysconfig::CACHEDATA_BASE, carMusicSysconfig::WEAATHER_TIMEOUT_H))
+          kCacheDataBase, kWeatherTimeoutHours))
 {
     manager = new QNetworkAccessManager(this);
     connect(manager, &QNetworkAccessManager::finished, this, &weatherAPI::onReplyFinished);
@@ -141,13 +156,13 @@ void weatherAPI::getweatherForCity(const QString &cityName)
     }
     qDebug() << "开始API 请求";
     if (!cityId.isEmpty()) {
-        QString urlString = QString(carMusicSysconfig::WEATHER_API_7D_URL)
+        QString urlString = QString(kWeatherApi7dUrl)
                                 .arg(cityId)
-                                .arg(carMusicSysconfig::WEATHER_API_KEY);
+                                .arg(kWeatherApiKey);
         QNetworkRequest request{QUrl(urlString)};
         QNetworkReply *reply = manager->get(request);
-        reply->setProperty(carMusicSysconfig::REQUEST_TYPE_KEY, carMusicSysconfig::REQUEST_TYPE_WEATHER);
-        reply->setProperty(carMusicSysconfig::REQUEST_CITY_ID_KEY, cityId);
+        reply->setProperty(kRequestTypeKey, kRequestTypeWeather);
+        reply->setProperty(kRequestCityIdKey, cityId);
         return;
     }
     getCityId(input);
@@ -155,26 +170,26 @@ void weatherAPI::getweatherForCity(const QString &cityName)
 
 void weatherAPI::getCityId(const QString &cityName)
 {
-    QString urlString = QString(carMusicSysconfig::WEATHER_CITY_LOOKUP_URL)
+    QString urlString = QString(kWeatherCityLookupUrl)
                             .arg(cityName)
-                            .arg(carMusicSysconfig::WEATHER_API_KEY);
+                            .arg(kWeatherApiKey);
     QNetworkRequest request{QUrl(urlString)};
     QNetworkReply *reply = manager->get(request);
-    reply->setProperty(carMusicSysconfig::REQUEST_TYPE_KEY, carMusicSysconfig::REQUEST_TYPE_CITY_LOOKUP);
-    reply->setProperty(carMusicSysconfig::REQUEST_CITY_NAME_KEY, cityName);
+    reply->setProperty(kRequestTypeKey, kRequestTypeCityLookup);
+    reply->setProperty(kRequestCityNameKey, cityName);
 }
 
 void weatherAPI::onReplyFinished(QNetworkReply *reply)
 {
-    if (reply->property(carMusicSysconfig::REQUEST_TYPE_KEY).toString() == carMusicSysconfig::REQUEST_TYPE_CITY_LOOKUP) {
+    if (reply->property(kRequestTypeKey).toString() == kRequestTypeCityLookup) {
         onCitySearchFinished(reply);
         return;
     }
     if (reply->error() == QNetworkReply::NoError) {
         int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-        if (statusCode == carMusicSysconfig::HTTP_STATUS_OK) {
+        if (statusCode == kHttpStatusOk) {
             QByteArray data = reply->readAll();
-            cityId = reply->property(carMusicSysconfig::REQUEST_CITY_ID_KEY).toString();
+            cityId = reply->property(kRequestCityIdKey).toString();
             qDebug() << "Received data:" << data;
             parseweatherJson(data);
         } else {
@@ -192,21 +207,21 @@ void weatherAPI::onCitySearchFinished(QNetworkReply *reply)
         QByteArray data = reply->readAll();
         QJsonDocument doc = QJsonDocument::fromJson(data);
         QJsonObject obj = doc.object();
-        if (obj.value("code").toString() == carMusicSysconfig::API_CODE_OK) {
+        if (obj.value("code").toString() == kApiCodeOk) {
             QJsonArray locationArray = obj.value("location").toArray();
             if (!locationArray.isEmpty()) {
                 QString queriedCityId = locationArray[0].toObject().value("id").toString();
                 if (!queriedCityId.isEmpty()) {
                     cityId = queriedCityId;
-                    const QString cityName = reply->property(carMusicSysconfig::REQUEST_CITY_NAME_KEY).toString();
+                    const QString cityName = reply->property(kRequestCityNameKey).toString();
                     saveCityIdCache(cityName, cityId);
-                    QString weatherUrl = QString(carMusicSysconfig::WEATHER_API_7D_URL)
+                    QString weatherUrl = QString(kWeatherApi7dUrl)
                                              .arg(cityId)
-                                             .arg(carMusicSysconfig::WEATHER_API_KEY);
+                                             .arg(kWeatherApiKey);
                     QNetworkRequest request{QUrl(weatherUrl)};
                     QNetworkReply *weatherReply = manager->get(request);
-                    weatherReply->setProperty(carMusicSysconfig::REQUEST_TYPE_KEY, carMusicSysconfig::REQUEST_TYPE_WEATHER);
-                    weatherReply->setProperty(carMusicSysconfig::REQUEST_CITY_ID_KEY, cityId);
+                    weatherReply->setProperty(kRequestTypeKey, kRequestTypeWeather);
+                    weatherReply->setProperty(kRequestCityIdKey, cityId);
                 }
             }
         }
@@ -228,7 +243,7 @@ void weatherAPI::parseweatherJson(const QByteArray &jsonData)
 
     // 检查返回码，200表示成功
     QString code = rootObj.value("code").toString();
-    if (code != carMusicSysconfig::API_CODE_OK) {
+    if (code != kApiCodeOk) {
         qWarning() << "API returned error code:" << code;
         return;
     }
@@ -258,8 +273,8 @@ void weatherAPI::parseweatherJson(const QByteArray &jsonData)
         QString formattedDate = QString("%1 %2/%3").arg(weekDay).arg(date.month()).arg(date.day());
 
         // 构建图标路径
-        QString amIcon = carMusicSysconfig::WEATHER_ICON_PATH + QString("%1%2.svg").arg(amcode).arg(carMusicSysconfig::ICON_USE_FILL);
-        QString pmIcon = carMusicSysconfig::WEATHER_ICON_PATH + QString("%1%2.svg").arg(pmcode).arg(carMusicSysconfig::ICON_USE_FILL);
+        QString amIcon = QString(kWeatherIconPath) + QString("%1%2.svg").arg(amcode).arg(kIconUseFill);
+        QString pmIcon = QString(kWeatherIconPath) + QString("%1%2.svg").arg(pmcode).arg(kIconUseFill);
 
         // 构建天气信息数组
         QVector<QString> dayInfo({formattedDate, amIcon, amText, tempMax, pmIcon, pmText, tempMin});

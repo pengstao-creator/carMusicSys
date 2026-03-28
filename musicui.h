@@ -1,27 +1,29 @@
 #ifndef MUSICUI_H
 #define MUSICUI_H
 
-#include <QWidget>
+#include "softwareuibase.h"
 #include <QStringList>
 
 namespace Ui {
 class musicUi;
 }
 class QMediaPlayer;
+class QPixmap;
+class QString;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 class QAudioOutput;
 #endif
 class QListWidgetItem;
 
-class musicUi : public QWidget
+class musicUi : public softwareUiBase
 {
     Q_OBJECT
-signals :
-    void exit();
-
 public:
     explicit musicUi(QWidget *parent = nullptr);
     ~musicUi();
+    static const QString &getSoftname();
+    static const QPixmap &getSofticon();
+    static softwareUiBase *getSingleton();
 
 private slots:
     void onPlayPause();

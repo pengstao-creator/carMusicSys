@@ -18,7 +18,7 @@ public:
     const QHash<QString,Overlay*>& getOvrlay() const;
     QGraphicsScene * getScene()const;
     Overlay *getOverlay(const QString &name) const;
-    void addOverlay(const QString &name,QWidget *widget,bool is_transparent = false);
+    void addOvrlay(const QString &name,QWidget *widget,bool is_transparent = false);
     void addOvrlay(const std::pair<QString,Overlay*>& overlay);
     void erase(const QString& name);
     QRectF getQRect() const;

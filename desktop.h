@@ -1,13 +1,16 @@
 #ifndef DESKTOP_H
 #define DESKTOP_H
 
+#include <QHash>
+#include <QList>
 #include <QWidget>
 
 namespace Ui {
 class desktop;
 }
-class wallpaerWidget;
+class QIcon;
 class QLabel;
+class QPushButton;
 class QResizeEvent;
 class QShowEvent;
 class QTimer;
@@ -21,25 +24,14 @@ class desktop : public QWidget
 public:
     explicit desktop(zAxisControl * zAxis_Ctrl,QWidget *parent = nullptr);
     ~desktop();
+    void addApp(const QString &softName, const QIcon &icon);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void on_leftApp1_clicked();
-
-    void on_leftApp2_clicked();
-
-    void on_leftApp3_clicked();
-
-    void on_leftApp4_clicked();
-    void on_rightApp1_clicked();
-    void on_rightApp2_clicked();
-    void on_rightApp3_clicked();
-
 private:
-    void openSoft(const QString& softName);
     void windowDesign();
     void setTime();
     void getTime(QLabel* ymd, QLabel* hms);
@@ -53,7 +45,8 @@ private:
     QLabel *timeYmdLabel;
     zAxisControl * zAxisCtrl;
     softwareControl * softCtrl;
-
+    QList<QPushButton*> appButtons;
+    int nextAppButtonIndex;
 
 };
 

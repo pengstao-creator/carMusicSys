@@ -4,9 +4,11 @@
 #include "settingui.h"
 #include "mapui.h"
 #include "videoui.h"
+#include "desktop.h"
+#include "softwareuibase.h"
 #include "Overlay.h"
 #include "zaxiscontrol.h"
-#include "Data.h"
+#include <QIcon>
 #include <QString>
 #include <QDebug>
 softwareControl::softwareControl(zAxisControl * zAxis_Ctrl,QObject *parent)
@@ -14,110 +16,70 @@ softwareControl::softwareControl(zAxisControl * zAxis_Ctrl,QObject *parent)
     , zAxisCtrl(zAxis_Ctrl)
 {}
 
-void softwareControl::openSoftware(const QString &name)
+void softwareControl::setupDesktopApps(desktop *desktopUi)
 {
-    qDebug() << "softwareControl::openSoftware" << name << "this" << this << "zAxisCtrl" << zAxisCtrl;
-    // 打开应用前统一暂停壁纸，避免天气/音乐浮层显示时底层视频继续消耗资源。
-    emit zAxisCtrl->wallpaperStop();
-    const auto &overlays = zAxisCtrl->getOvrlay();
-    qDebug() << "softwareControl::openSoftware overlays" << overlays.keys();
-    if (overlays.contains(name)) {
-        // Overlay 已存在则直接复用，避免重复 new 页面导致状态丢失与内存增长。
-        Overlay *overlay = overlays.value(name);
-        qDebug() << "softwareControl::reuseOverlay" << name << overlay;
-        if (overlay) {
-            overlay->setGeometry(zAxisCtrl->getQRect());
-            overlay->show();
-        }
+    if (!desktopUi) {
         return;
     }
+    desktopUi->addApp(WeatherUi::getSoftname(), QIcon(WeatherUi::getSofticon()));
+    desktopUi->addApp(musicUi::getSoftname(), QIcon(musicUi::getSofticon()));
+    desktopUi->addApp(mapUi::getSoftname(), QIcon(mapUi::getSofticon()));
+    desktopUi->addApp(videoUi::getSoftname(), QIcon(videoUi::getSofticon()));
+    desktopUi->addApp(settingUi::getSoftname(), QIcon(settingUi::getSofticon()));
 
-    if(name == carMusicSysconfig::APP_WEATHER)
+}
+
+softwareUiBase *softwareControl::getSoftWidget(const QString &name)
+{
+    if(WeatherUi::getSoftname() == name)
     {
-        // 首次打开天气：创建 WeatherUi 并挂到独立 overlay 层。
-        auto weatherApp = new WeatherUi();
-        qDebug() << "softwareControl::create WeatherUi" << weatherApp;
-        zAxisCtrl->addOverlay(carMusicSysconfig::APP_WEATHER, weatherApp);
-        // 天气页点击退出后，仅隐藏 overlay 并恢复壁纸，不销毁页面实例。
-        // 这样二次进入天气页时可复用已有控件状态和已加载资源。
-        connect(weatherApp,&WeatherUi::exit,this,[this](){
-            qDebug() << "softwareControl::weather exit signal";
-            const auto &overlays = zAxisCtrl->getOvrlay();
-            if (overlays.contains(carMusicSysconfig::APP_WEATHER)) {
-                Overlay *overlay = overlays.value(carMusicSysconfig::APP_WEATHER);
-                qDebug() << "softwareControl::weather hide overlay" << overlay;
-                if (overlay) {
-                    overlay->hide();
-                    emit zAxisCtrl->wallpaperStart();
-                }
-            }
-        });
+        return WeatherUi::getSingleton();
     }
-    else if(name == carMusicSysconfig::APP_QQMUSIC)
+    else if(musicUi::getSoftname() == name)
     {
-        auto musicApp = new musicUi();
-        qDebug() << "softwareControl::create musicUi" << musicApp;
-        zAxisCtrl->addOverlay(carMusicSysconfig::APP_QQMUSIC, musicApp);
-        connect(musicApp,&musicUi::exit,this,[this](){
-            qDebug() << "softwareControl::music exit signal";
-            const auto &overlays = zAxisCtrl->getOvrlay();
-            if (overlays.contains(carMusicSysconfig::APP_QQMUSIC)) {
-                Overlay *overlay = overlays.value(carMusicSysconfig::APP_QQMUSIC);
-                if (overlay) {
-                    overlay->hide();
-                    emit zAxisCtrl->wallpaperStart();
-                }
-            }
-        });
+        return musicUi::getSingleton();
     }
-    else if(name == carMusicSysconfig::APP_SETTING)
+    else if(mapUi::getSoftname() == name)
     {
-        auto settingApp = new settingUi();
-        zAxisCtrl->addOverlay(carMusicSysconfig::APP_SETTING, settingApp);
-        connect(settingApp,&settingUi::exit,this,[this](){
-            const auto &overlays = zAxisCtrl->getOvrlay();
-            if (overlays.contains(carMusicSysconfig::APP_SETTING)) {
-                Overlay *overlay = overlays.value(carMusicSysconfig::APP_SETTING);
-                if (overlay) {
-                    overlay->hide();
-                    emit zAxisCtrl->wallpaperStart();
-                }
-            }
-        });
+        return mapUi::getSingleton();
     }
-    else if(name == carMusicSysconfig::APP_AMAP)
+    else if(videoUi::getSoftname() == name)
     {
-        auto mapApp = new mapUi();
-        zAxisCtrl->addOverlay(carMusicSysconfig::APP_AMAP, mapApp);
-        connect(mapApp,&mapUi::exit,this,[this](){
-            const auto &overlays = zAxisCtrl->getOvrlay();
-            if (overlays.contains(carMusicSysconfig::APP_AMAP)) {
-                Overlay *overlay = overlays.value(carMusicSysconfig::APP_AMAP);
-                if (overlay) {
-                    overlay->hide();
-                    emit zAxisCtrl->wallpaperStart();
-                }
-            }
-        });
+        return videoUi::getSingleton();
     }
-    else if(name == carMusicSysconfig::APP_BILIBILI)
+    else if(settingUi::getSoftname() == name)
     {
-        auto videoApp = new videoUi();
-        zAxisCtrl->addOverlay(carMusicSysconfig::APP_BILIBILI, videoApp);
-        connect(videoApp,&videoUi::exit,this,[this](){
-            const auto &overlays = zAxisCtrl->getOvrlay();
-            if (overlays.contains(carMusicSysconfig::APP_BILIBILI)) {
-                Overlay *overlay = overlays.value(carMusicSysconfig::APP_BILIBILI);
-                if (overlay) {
-                    overlay->hide();
-                    emit zAxisCtrl->wallpaperStart();
-                }
-            }
-        });
+        return settingUi::getSingleton();
+    }
+    else
+    {
+        qDebug() << "Software not found: " << name;
     }
 
+    return nullptr;
+}
 
-
+void softwareControl::openSoftware(const QString &name)
+{
+    if(zAxisCtrl)
+    {
+        emit zAxisCtrl->wallpaperStop();
+        auto softWidget = getSoftWidget(name);
+        if(softWidget == nullptr){return;}
+        if(zAxisCtrl->getOverlay(name) == nullptr)
+        {
+            //添加软件窗口
+            zAxisCtrl->addOvrlay(name,softWidget);
+            connect(softWidget,&softwareUiBase::exit,this,[this,softWidget](){
+                zAxisCtrl->wallpaperStart();
+                if(softWidget)softWidget->hide();
+            });
+        }
+        else
+        {
+            softWidget->show();
+        }
+    }
 }
 
 

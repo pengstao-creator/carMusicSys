@@ -34,6 +34,7 @@ HEADERS += Data.h \
            Player.h \
            musicui.h \
            settingui.h \
+           softwareuibase.h \
            softwarecontrol.h \
            videoui.h \
            wallpaerWidget.h \
@@ -57,6 +58,7 @@ SOURCES += desktop.cpp \
            Player.cpp \
            musicui.cpp \
            settingui.cpp \
+           softwareuibase.cpp \
            softwarecontrol.cpp \
            videoui.cpp \
            wallpaerWidget.cpp \

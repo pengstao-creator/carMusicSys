@@ -1,7 +1,7 @@
 #ifndef WEATHERUI_H
 #define WEATHERUI_H
 
-#include <QWidget>
+#include "softwareuibase.h"
 #include <QVector>
 #include <QString>
 #include <QPixmap>
@@ -16,24 +16,21 @@ namespace Ui {
 class WeatherUi;
 }
 
-class WeatherUi : public QWidget
+class WeatherUi : public softwareUiBase
 {
     Q_OBJECT
 public:
     explicit WeatherUi(QWidget *parent = nullptr);
     ~WeatherUi();
-
+    static const QString &getSoftname();
+    static const QPixmap &getSofticon() ;
+    static softwareUiBase*getSingleton() ;
     void updateWeather(const QVector<QVector<QString>> &weekForecast);
     void setBackground(const QString &backgroundPath);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-signals:
-    void exit();
 
 private slots:
     void on_exitButton_clicked();

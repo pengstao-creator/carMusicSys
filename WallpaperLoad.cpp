@@ -1,13 +1,17 @@
 #include "WallpaperLoad.h"
 #include "wallpaerWidget.h"
 #include "zaxiscontrol.h"
-#include "Data.h"
 #include <QDir>
 #include <QTimer>
 #include <QDebug>
+
+namespace {
+constexpr int kWallpaperSwitchIntervalMs = 1000 * 5;
+}
+
 WallpaperLoad::WallpaperLoad(zAxisControl * zAxis_Ctrl,QObject *parent)
     : QObject(parent)
-    , _stime(carMusicSysconfig::WALLPAPER_SWITCH_INTERVAL_MS)
+    , _stime(kWallpaperSwitchIntervalMs)
     , _switchTime(new QTimer(this))
     , _wallpaper(nullptr)
     , zAxisCtrl(zAxis_Ctrl)

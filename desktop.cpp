@@ -2,17 +2,22 @@
 #include "ui_desktop.h"
 #include "zaxiscontrol.h"
 #include "softwarecontrol.h"
-#include "Data.h"
 #include <QTime>
 #include <QDate>
 #include <QLocale>
 #include <QTimer>
+#include <QIcon>
 #include <QLabel>
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QSizePolicy>
 #include <QDebug>
+
+namespace {
+constexpr int kClockTickIntervalMs = 1000 * 60;
+}
+
 desktop::desktop(zAxisControl * zAxis_Ctrl,QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::desktop)
@@ -21,6 +26,7 @@ desktop::desktop(zAxisControl * zAxis_Ctrl,QWidget *parent)
     , timeYmdLabel(nullptr)
     , zAxisCtrl(zAxis_Ctrl)
     , softCtrl(new softwareControl(zAxisCtrl,this))
+    , nextAppButtonIndex(0)
 
 {
     ui->setupUi(this);
@@ -29,6 +35,7 @@ desktop::desktop(zAxisControl * zAxis_Ctrl,QWidget *parent)
     ui->rootLayout->setStretch(2, 3);
     timeHmsLabel = ui->timeHmsLabel;
     timeYmdLabel = ui->timeYmdLabel;
+    appButtons = { ui->leftApp1, ui->leftApp2, ui->leftApp3, ui->leftApp4, ui->rightApp1, ui->rightApp2, ui->rightApp3 };
     windowDesign();
     QTimer::singleShot(0, this, [this]() { updateIconButtonSizes(); });
 
@@ -43,6 +50,7 @@ void desktop::windowDesign()
 {
     setupButtonBaseStyle();
     setupIconButtons();
+    softCtrl->setupDesktopApps(this);
     setTime();
 }
 
@@ -67,7 +75,7 @@ void desktop::setTime()
         getTime(timeYmdLabel,timeHmsLabel);
     });
     getTime(timeYmdLabel,timeHmsLabel);
-    timeclock->start(carMusicSysconfig::CLOCK_TICK_INTERVAL_MS);
+    timeclock->start(kClockTickIntervalMs);
 }
 
 void desktop::getTime(QLabel* ymd, QLabel* hms)
@@ -80,52 +88,29 @@ void desktop::getTime(QLabel* ymd, QLabel* hms)
     // 获取当前本地时间
     QTime currentTime = QTime::currentTime();
     hms->setText(currentTime.toString("hh:mm"));
-
-
-}
-#include <QThread>
-void desktop::on_leftApp1_clicked()
-{
-    qDebug() << "on_weather_clicked" <<  QThread::currentThreadId();
-    openSoft(carMusicSysconfig::APP_WEATHER);
 }
 
 
-void desktop::on_leftApp2_clicked()
+
+void desktop::addApp(const QString &softName, const QIcon &icon)
 {
-    openSoft(carMusicSysconfig::APP_QQMUSIC);
-}
-
-
-void desktop::on_leftApp3_clicked()
-{
-    openSoft(carMusicSysconfig::APP_AMAP);
-}
-
-
-void desktop::on_leftApp4_clicked()
-{
-    openSoft(carMusicSysconfig::APP_BILIBILI);
-}
-
-void desktop::on_rightApp1_clicked()
-{
-    openSoft(carMusicSysconfig::APP_SETTING);
-}
-
-void desktop::on_rightApp2_clicked()
-{
-    openSoft(carMusicSysconfig::APP_AMAP);
-}
-
-void desktop::on_rightApp3_clicked()
-{
-    openSoft(carMusicSysconfig::APP_BILIBILI);
-}
-
-void desktop::openSoft(const QString &softName)
-{
-    softCtrl->openSoftware(softName);
+    if (nextAppButtonIndex < 0 || nextAppButtonIndex >= appButtons.size()) {
+        return;
+    }
+    QPushButton *button = appButtons[nextAppButtonIndex++];
+    if (!button) {
+        return;
+    }
+    button->setText(QString());
+    button->setStyleSheet("QPushButton{border:none;background:transparent;} QPushButton:pressed{background:rgba(255,255,255,25);}");
+    button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    button->setMinimumSize(72, 72);
+    button->setIcon(icon);
+    button->setEnabled(!icon.isNull()); 
+    connect(button,&QPushButton::clicked,this,[this,softName](){
+        softCtrl->openSoftware(softName);
+    });
+    updateIconButtonSizes();
 }
 
 void desktop::setupButtonBaseStyle()
@@ -150,38 +135,20 @@ void desktop::setupIconButtons()
     ui->rightGridLayout->setColumnStretch(0, 1);
     ui->rightGridLayout->setColumnStretch(1, 1);
 
-    const QList<QPushButton*> iconButtons = { ui->leftApp1, ui->leftApp2, ui->leftApp3, ui->leftApp4, ui->rightApp1, ui->rightApp2, ui->rightApp3 };
-    const QList<QString> iconPaths = {
-        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "6.png",
-        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "2.png",
-        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "4.png",
-        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "3.png",
-        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "10.png",
-        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "4.png",
-        QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "3.png"
-    };
-
-    for (int i = 0; i < iconButtons.size(); ++i) {
-        QPushButton *button = iconButtons[i];
-        button->setStyleSheet("QPushButton{border:none;background:transparent;} QPushButton:pressed{background:rgba(255,255,255,25);}");
-        button->setText(QString());
-        button->setIcon(QIcon(iconPaths[i]));
-        button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        button->setMinimumSize(72, 72);
-    }
-
-    const QList<QPushButton*> buttons = findChildren<QPushButton*>();
-    for (QPushButton *button : buttons) {
-        const bool hasIcon = !button->icon().isNull();
-        button->setEnabled(hasIcon);
+    nextAppButtonIndex = 0;
+    for (QPushButton *button : appButtons) {
+        if (!button) {
+            continue;
+        }
+        button->setIcon(QIcon());
+        button->setEnabled(false);
     }
     updateIconButtonSizes();
 }
 
 void desktop::updateIconButtonSizes()
 {
-    const QList<QPushButton*> iconButtons = { ui->leftApp1, ui->leftApp2, ui->leftApp3, ui->leftApp4, ui->rightApp1, ui->rightApp2, ui->rightApp3 };
-    for (QPushButton *button : iconButtons) {
+    for (QPushButton *button : appButtons) {
         const int side = qMax(24, qMin(button->width(), button->height()) - 16);
         button->setIconSize(QSize(side, side));
     }

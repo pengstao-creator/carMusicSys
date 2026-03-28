@@ -1,22 +1,24 @@
 #ifndef MAPUI_H
 #define MAPUI_H
 
-#include <QWidget>
+#include "softwareuibase.h"
+class QPixmap;
+class QString;
 
 namespace Ui {
 class mapUi;
 }
 
-class mapUi : public QWidget
+class mapUi : public softwareUiBase
 {
     Q_OBJECT
 
 public:
     explicit mapUi(QWidget *parent = nullptr);
     ~mapUi();
-
-signals:
-    void exit();
+    static const QString &getSoftname();
+    static const QPixmap &getSofticon();
+    static softwareUiBase *getSingleton();
 
 private slots:
     void on_exitButton_clicked();

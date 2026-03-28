@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#WeatherUi {
-    border-image: url(:/Resource/app/7.png) 0 0 0 0 stretch stretch;
+    border-image: url(:/Resource/app/weather_background.jpg) 0 0 0 0 stretch stretch;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
@@ -51,7 +51,7 @@
         <string notr="true">QPushButton {
     background: transparent;
     border: none;
-    image: url(:/Resource/app/9.svg);
+    image: url(:/Resource/app/search.svg);
 }
 QPushButton:hover { background: transparent; border: none; }
 QPushButton:pressed { background: transparent; border: none; }</string>
@@ -110,7 +110,7 @@ QPushButton:pressed { background: transparent; border: none; }</string>
            <string notr="true">QPushButton {
     background: transparent;
     border: none;
-    image: url(:/Resource/app/9.svg);
+    image: url(:/Resource/app/search.svg);
 }
 QPushButton:hover { background: transparent; border: none; }
 QPushButton:pressed { background: transparent; border: none; }</string>
@@ -167,7 +167,7 @@ QPushButton:pressed { background: transparent; border: none; }</string>
         <string notr="true">QPushButton {
     background: transparent;
     border: none;
-    image: url(:/Resource/app/8.svg);
+    image: url(:/Resource/app/close.svg);
 }
 QPushButton:hover {
     background: transparent;

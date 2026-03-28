@@ -6,6 +6,7 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMediaPlayer>
+#include <QPixmap>
 #include <QRandomGenerator>
 #include <QSlider>
 #include <QUrl>
@@ -14,8 +15,14 @@
 #else
 // Qt5不需要单独包含QAudioOutput
 #endif
+
+namespace {
+constexpr const char * APP_QQMUSIC = "QQMusic";
+constexpr const char * QQMUSIC_ICON = ":/Resource/app/music_app.png";
+}
+
 musicUi::musicUi(QWidget *parent)
-    : QWidget(parent)
+    : softwareUiBase(parent)
     , ui(new Ui::musicUi)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     , m_audioOutput(nullptr)
@@ -83,6 +90,24 @@ musicUi::musicUi(QWidget *parent)
 musicUi::~musicUi()
 {
     delete ui;
+}
+
+const QString &musicUi::getSoftname()
+{
+    static const QString softName = QString::fromUtf8(APP_QQMUSIC);
+    return softName;
+}
+
+const QPixmap &musicUi::getSofticon()
+{
+    static const QPixmap softIcon(QString::fromUtf8(QQMUSIC_ICON));
+    return softIcon;
+}
+
+softwareUiBase *musicUi::getSingleton()
+{
+    static auto musicApp = new musicUi();
+    return musicApp;
 }
 
 QString musicUi::resolveMusicDir() const

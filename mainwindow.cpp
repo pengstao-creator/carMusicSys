@@ -4,12 +4,17 @@
 #include "wallpaerWidget.h"
 #include "desktop.h"
 #include "zaxiscontrol.h"
-#include "Data.h"
 #include <QStatusBar>
 #include <QCoreApplication>
 #include <QDir>
 #include <QDebug>
 
+namespace {
+constexpr const char *kProjectRootName = "carMusicSys";
+constexpr const char *kWallpaperDirSuffix = "/Wallpaper/";
+constexpr const char *kAppIconPath = ":/Resource/app/app_icon.jpg";
+constexpr const char *kOverlayDesktop = "dosktop";
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -43,15 +48,15 @@ QString MainWindow::getWallpaperPath()
             return QDir::cleanPath(dir.absoluteFilePath("Wallpaper")) + "/";
         }
         // 情况2：当前目录上层包含 carMusicSys/Wallpaper（开发构建目录最常见）
-        if (dir.exists(QString::fromUtf8(carMusicSysconfig::PROJECT_ROOT_NAME) + QString::fromUtf8(carMusicSysconfig::WALLPAPER_DIR_SUFFIX))) {
-            return QDir::cleanPath(dir.absoluteFilePath(QString::fromUtf8(carMusicSysconfig::PROJECT_ROOT_NAME) + QString::fromUtf8(carMusicSysconfig::WALLPAPER_DIR_SUFFIX))) + "/";
+        if (dir.exists(QString::fromUtf8(kProjectRootName) + QString::fromUtf8(kWallpaperDirSuffix))) {
+            return QDir::cleanPath(dir.absoluteFilePath(QString::fromUtf8(kProjectRootName) + QString::fromUtf8(kWallpaperDirSuffix))) + "/";
         }
         if (!dir.cdUp()) {
             break;
         }
     }
     // 兜底：保持旧行为，返回 applicationDirPath + /Wallpaper/
-    return QCoreApplication::applicationDirPath() + carMusicSysconfig::WALLPAPER_DIR_SUFFIX;
+    return QCoreApplication::applicationDirPath() + QString::fromUtf8(kWallpaperDirSuffix);
 }
 
 MainWindow::~MainWindow()
@@ -80,7 +85,7 @@ void MainWindow::setMainWindow()
     //设置标题样式
     // 使用 '|' 组合多个标志
     // setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    QIcon icon(carMusicSysconfig::APP_ICON_PATH);
+    QIcon icon(QString::fromUtf8(kAppIconPath));
     setWindowIcon(icon);
     setWindowTitle("车载音乐");
 
@@ -120,5 +125,5 @@ void MainWindow::setTime()
 void MainWindow::addWdiget()
 {
     //桌面控制,只负责app布局
-    zAxisCtrl->addOverlay(carMusicSysconfig::OVERLAY_DESKTOP,new desktop(zAxisCtrl),true);
+    zAxisCtrl->addOvrlay(QString::fromUtf8(kOverlayDesktop),new desktop(zAxisCtrl),true);
 }

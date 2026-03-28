@@ -35,6 +35,10 @@ constexpr int kAmPmSpacing = 8;
 constexpr int kDateFontSize = 14;
 constexpr int kTextFontSize = 12;
 constexpr int kDayCardCount = 7;
+constexpr const char *kDefaultCityName = "成都";
+constexpr const char * WEATHER_BACKGROUND = ":/Resource/app/weather_background.jpg"; // 天气模块背景图文件名
+constexpr const char * APP_WEATHER = "weather"; // 应用标识：天气
+constexpr const char * WEATHER_ICON = ":/Resource/app/weather_app.png";
 
 void setSvgLabelIcon(QLabel *label, const QString &iconPath, int iconSize)
 {
@@ -53,9 +57,9 @@ void setSvgLabelIcon(QLabel *label, const QString &iconPath, int iconSize)
 }
 }
 
-WeatherUi::WeatherUi(QWidget *parent) : QWidget(parent)
+WeatherUi::WeatherUi(QWidget *parent) : softwareUiBase(parent)
     , weatherService(new weatherAPI(this))
-    , currentCityName(QString::fromUtf8(carMusicSysconfig::DEFAULT_CITY))
+    , currentCityName(QString::fromUtf8(kDefaultCityName))
     , errorTipLabel(nullptr)
     , backgroundLabel(nullptr)
     , errorTipTimer(new QTimer(this))
@@ -65,10 +69,7 @@ WeatherUi::WeatherUi(QWidget *parent) : QWidget(parent)
     qDebug() << "WeatherUi::ctor" << this << "parent" << parent;
     setupUI();
     // 天气页背景加载入口：
-    // 优先使用配置项 WEATHER_BACKGROUND（当前为 7.png），
-    // 若运行环境无法解码 PNG，会在 setBackground 内自动回退到 5.jpg。
-    const QString backgroundPath = QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH)
-                                 + QString::fromUtf8(carMusicSysconfig::WEATHER_BACKGROUND);
+    const QString backgroundPath(QString::fromUtf8(WEATHER_BACKGROUND));
     setBackground(backgroundPath);
 
     connect(weatherService, &weatherAPI::weatherDataReady, this, &WeatherUi::updateWeather);
@@ -269,7 +270,7 @@ void WeatherUi::rebuildWeatherCards()
 
 void WeatherUi::resizeEvent(QResizeEvent *event)
 {
-    QWidget::resizeEvent(event);
+    softwareUiBase::resizeEvent(event);
     if (backgroundLabel) {
         backgroundLabel->setGeometry(rect());
     }
@@ -305,7 +306,7 @@ void WeatherUi::setBackground(const QString &backgroundPath)
     if (backgroundPixmap.isNull()) {
         // 回退背景用于保证“至少可见”：
         // 即便 PNG 解码失败，天气页依然有背景，不影响主流程体验。
-        const QString fallbackPath = QString::fromUtf8(carMusicSysconfig::WEATHER_APP_PATH) + "7.jpg";
+        const QString fallbackPath = QString::fromUtf8(WEATHER_BACKGROUND);
         backgroundPixmap = QPixmap(fallbackPath);
         if (!backgroundPixmap.isNull()) {
             backgroundImagePath = fallbackPath;
@@ -344,9 +345,29 @@ void WeatherUi::setBackground(const QString &backgroundPath)
     update();
 }
 
+
+
+const QString &WeatherUi::getSoftname()
+{
+    static const QString softName = QString::fromUtf8(APP_WEATHER);
+    return softName;
+}
+
+const QPixmap &WeatherUi::getSofticon()
+{
+    static const QPixmap softIcon(QString::fromUtf8(WEATHER_ICON));
+    return softIcon;
+}
+
+softwareUiBase *WeatherUi::getSingleton()
+{
+    static auto wearherapp = new WeatherUi();
+    return wearherapp;
+}
+
 void WeatherUi::paintEvent(QPaintEvent *event)
 {
-    QWidget::paintEvent(event);
+    softwareUiBase::paintEvent(event);
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -361,21 +382,6 @@ void WeatherUi::paintEvent(QPaintEvent *event)
         }
     }
 
-}
-
-void WeatherUi::mousePressEvent(QMouseEvent *event)
-{
-    event->accept();
-}
-
-void WeatherUi::mouseMoveEvent(QMouseEvent *event)
-{
-    event->accept();
-}
-
-void WeatherUi::mouseReleaseEvent(QMouseEvent *event)
-{
-    event->accept();
 }
 
 void WeatherUi::on_exitButton_clicked()

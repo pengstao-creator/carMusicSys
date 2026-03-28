@@ -37,7 +37,7 @@ Overlay *zAxisControl::getOverlay(const QString &name) const
     return m_overlay.value(name, nullptr);
 }
 
-void zAxisControl::addOverlay(const QString &name, QWidget *widget,bool is_transparent)
+void zAxisControl::addOvrlay(const QString &name, QWidget *widget,bool is_transparent)
 {
     qDebug() << "zAxisControl::addOverlay" << name << "widget" << widget << "transparent" << is_transparent;
     if (m_overlay.contains(name)) {
