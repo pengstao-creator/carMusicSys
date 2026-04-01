@@ -30,11 +30,11 @@ private slots:
 
 private:
     void parseweatherJson(const QByteArray &jsonData); // 解析JSON数据
-    void getCityId(const QString &cityName); // 通过城市名查询和风城市ID
+    void getCityId(const QString &cityName, quint64 requestSeq); // 通过城市名查询和风城市ID
+    void requestWeatherByCityId(const QString &targetCityId, quint64 requestSeq); // 根据城市ID请求天气
+    void tryLoadWeatherCacheAsync(const QString &targetCityId, quint64 requestSeq); // 在线程池中异步读缓存
     void loadCityIdCache();
-    void saveCityIdCache(const QString &cityName, const QString &resolvedCityId);
-    QString cityLookupKey(const QString &cityName) const;
-    void testNetworkConnection(); // 测试网络连接
+    void saveCityIdCache();
     class WeatherData;
     class CityLookupData;
 
@@ -42,7 +42,8 @@ private:
     std::unique_ptr<CacheManager<WeatherData>> cacheData;
     std::unique_ptr<CacheManager<CityLookupData>> cityLookupCacheData;
     QString cityId; // 最近一次查询到的城市ID
-    QHash<QString, QString> cityIdMap;
+    std::unique_ptr<CityLookupData> cityData;
+    quint64 activeRequestSeq; // 当前生效请求序号（用于丢弃过期回包）
 };
 
 #endif // WEATHERAPI_H

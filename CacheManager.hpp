@@ -9,7 +9,7 @@
 #include <QStandardPaths>
 #include <QDateTime>
 #include <QDebug>
-
+#include <QThread>
 
 template<typename DataType>
 class CacheManager
@@ -26,6 +26,7 @@ public:
 
     bool load(const QString &key, DataType &data) const
     {
+
         QString filePath = cacheFilePath(key);
         if (!isValid(filePath)) return false;
 

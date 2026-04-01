@@ -12,7 +12,7 @@
 namespace {
 constexpr const char *kProjectRootName = "carMusicSys";
 constexpr const char *kWallpaperDirSuffix = "/Wallpaper/";
-constexpr const char *kAppIconPath = ":/Resource/app/app_icon.jpg";
+constexpr const char *kAppIconPath = ":/Resource/app/common/app_icon.jpg";
 constexpr const char *kOverlayDesktop = "dosktop";
 }
 

@@ -17,14 +17,16 @@
 #include <QRegularExpression>
 #include <QDir>
 #include <QFileInfo>
+#include <QFutureWatcher>
+#include <QtConcurrent>
+#include "AppThreadPool.h"
 
 namespace {
 constexpr const char *kCacheDataBase = "cacheData";
 constexpr const char *kWeatherApiKey = "f909afa4e64542abb2920be08d0f2995";
 constexpr const char *kWeatherIconPath = ":/Resource/weatherIcons/";
-constexpr const char *kIconUseFill = "";
+constexpr const char *kIconUseFill = "-fill";
 constexpr const char *kDefaultCityIdRaw = "101270101";
-constexpr const char *kCityLookupKeyPrefixRaw = "city_lookup_";
 constexpr const char *kWeatherApi7dUrl = "https://n36cdphw5g.re.qweatherapi.com/v7/weather/7d?location=%1&key=%2";
 constexpr const char *kWeatherCityLookupUrl = "https://n36cdphw5g.re.qweatherapi.com/geo/v2/city/lookup?location=%1&key=%2";
 constexpr const char *kRequestTypeKey = "requestType";
@@ -32,11 +34,12 @@ constexpr const char *kRequestTypeWeather = "weather";
 constexpr const char *kRequestTypeCityLookup = "cityLookup";
 constexpr const char *kRequestCityIdKey = "cityId";
 constexpr const char *kRequestCityNameKey = "cityName";
+constexpr const char *kRequestSeqKey = "requestSeq";
 constexpr const char *kApiCodeOk = "200";
 constexpr int kHttpStatusOk = 200;
 constexpr int kWeatherTimeoutHours = 6;
 const QString kDefaultCityId = QString::fromUtf8(kDefaultCityIdRaw);
-const QString kCityLookupPrefix = QString::fromUtf8(kCityLookupKeyPrefixRaw);
+const QString kCityLookup= QString::fromUtf8(kRequestTypeCityLookup);
 }
 
 weatherAPI::weatherAPI(QObject *parent)
@@ -45,6 +48,8 @@ weatherAPI::weatherAPI(QObject *parent)
           kCacheDataBase, kWeatherTimeoutHours))
     , cityLookupCacheData(std::make_unique<CacheManager<CityLookupData>>(
           kCacheDataBase, kWeatherTimeoutHours))
+    , cityData(std::make_unique<CityLookupData>())
+    , activeRequestSeq(0)
 {
     manager = new QNetworkAccessManager(this);
     connect(manager, &QNetworkAccessManager::finished, this, &weatherAPI::onReplyFinished);
@@ -53,6 +58,8 @@ weatherAPI::weatherAPI(QObject *parent)
 
 weatherAPI::~weatherAPI()
 {
+    //析构保存缓存
+    saveCityIdCache();
 }
 
 class weatherAPI::WeatherData
@@ -85,16 +92,33 @@ public:
 
 class weatherAPI::CityLookupData
 {
-public:
-    QString cityName;
-    QString cityId;
-
+public: 
     QByteArray toJson() const
     {
+        if(cityIdMap.isEmpty())return QByteArray();
         QJsonObject obj;
-        obj["cityName"] = cityName;
-        obj["cityId"] = cityId;
+        for(auto it = cityIdMap.begin();it != cityIdMap.end();++it)
+        {
+            obj[it.key()] = it.value();
+        }
         return QJsonDocument(obj).toJson();
+    }
+
+    QString find(const QString& key) const
+    {
+        if(cityIdMap.isEmpty()) return QString();
+        auto it = cityIdMap.find(key);
+        if(it != cityIdMap.end())
+        {
+            return it.value();
+        }
+        return QString();
+    }
+
+
+    void addDate(const QString& key,const QString& name)
+    {
+        cityIdMap.insert(key,name);
     }
 
     bool fromJson(const QByteArray &jsonData)
@@ -102,73 +126,96 @@ public:
         QJsonDocument doc = QJsonDocument::fromJson(jsonData);
         if (doc.isNull()) return false;
         QJsonObject obj = doc.object();
-        cityName = obj.value("cityName").toString();
-        cityId = obj.value("cityId").toString();
-        return !cityName.isEmpty() && !cityId.isEmpty();
+        if(obj.isEmpty()) return false;
+        for(auto it = obj.begin();it != obj.end();++it)
+        {
+            cityIdMap[it.key()] = it.value().toString();
+        }
+        return true;
     }
+private:
+    QHash<QString, QString> cityIdMap;
 };
-
-QString weatherAPI::cityLookupKey(const QString &cityName) const
-{
-    QString key = cityName.trimmed();
-    key.replace(QRegularExpression("[\\\\/:*?\"<>|\\s]+"), "_");
-    return kCityLookupPrefix + key;
-}
 
 void weatherAPI::loadCityIdCache()
 {
-    cityIdMap.clear();
-    const QDir dir(cityLookupCacheData->getcacheDir());
-    const QStringList files = dir.entryList(QStringList() << QString("%1*.json").arg(kCityLookupPrefix), QDir::Files);
-    for (const QString &fileName : files) {
-        QString key = QFileInfo(fileName).completeBaseName();
-        CityLookupData data;
-        if (cityLookupCacheData->load(key, data)) {
-            cityIdMap.insert(data.cityName, data.cityId);
-        }
+    // 防御式保护：cityData 为空时不进行解引用，避免启动阶段崩溃。
+    if (!cityData) {
+        return;
     }
+    cityLookupCacheData->load(kCityLookup, *cityData);
 }
 
-void weatherAPI::saveCityIdCache(const QString &cityName, const QString &resolvedCityId)
+void weatherAPI::saveCityIdCache()
 {
-    CityLookupData data;
-    data.cityName = cityName;
-    data.cityId = resolvedCityId;
-    cityLookupCacheData->save(cityLookupKey(cityName), data);
-    cityIdMap.insert(cityName, resolvedCityId);
+    // 防御式保护：析构阶段若 cityData 异常为空，跳过保存，避免崩溃。
+    if (!cityData) {
+        return;
+    }
+    cityLookupCacheData->save(kCityLookup,*cityData);
 }
 
 void weatherAPI::getweatherForCity(const QString &cityName)
 {
+    const quint64 requestSeq = ++activeRequestSeq;
     const QString input = cityName.trimmed();
     cityId.clear();
     if (input.isEmpty()) {
         cityId = kDefaultCityId;
-    } else if (cityIdMap.contains(input)) {
-        cityId = cityIdMap.value(input);
+    } else{
+        // 使用 trim 后的输入参与缓存查询，避免前后空格导致缓存 miss。
+        cityId = cityData ? cityData->find(input) : QString();
     }
 
-    WeatherData weatherCache;
-    if (!cityId.isEmpty() && cacheData->load(cityId, weatherCache))
-    {
-        parseweatherJson(weatherCache.toJson());
+    if (!cityId.isEmpty()) {
+        // 先在线程池中异步查缓存，未命中再请求网络，避免主线程被文件IO阻塞。
+        tryLoadWeatherCacheAsync(cityId, requestSeq);
         return;
     }
     qDebug() << "开始API 请求";
-    if (!cityId.isEmpty()) {
-        QString urlString = QString(kWeatherApi7dUrl)
-                                .arg(cityId)
-                                .arg(kWeatherApiKey);
-        QNetworkRequest request{QUrl(urlString)};
-        QNetworkReply *reply = manager->get(request);
-        reply->setProperty(kRequestTypeKey, kRequestTypeWeather);
-        reply->setProperty(kRequestCityIdKey, cityId);
-        return;
-    }
-    getCityId(input);
+    getCityId(input, requestSeq);
 }
 
-void weatherAPI::getCityId(const QString &cityName)
+void weatherAPI::requestWeatherByCityId(const QString &targetCityId, quint64 requestSeq)
+{
+    QString urlString = QString(kWeatherApi7dUrl)
+                            .arg(targetCityId)
+                            .arg(kWeatherApiKey);
+    QNetworkRequest request{QUrl(urlString)};
+    QNetworkReply *reply = manager->get(request);
+    reply->setProperty(kRequestTypeKey, kRequestTypeWeather);
+    reply->setProperty(kRequestCityIdKey, targetCityId);
+    reply->setProperty(kRequestSeqKey, QVariant::fromValue<qulonglong>(requestSeq));
+}
+
+void weatherAPI::tryLoadWeatherCacheAsync(const QString &targetCityId, quint64 requestSeq)
+{
+    auto *watcher = new QFutureWatcher<QByteArray>(this);
+    auto *cache = cacheData.get();
+    watcher->setFuture(QtConcurrent::run(AppThreadPool::globalPool(), [cache, targetCityId]() {
+        WeatherData weatherCache;
+        if (cache && cache->load(targetCityId, weatherCache)) {
+            return weatherCache.toJson();
+        }
+        return QByteArray();
+    }));
+
+    connect(watcher, &QFutureWatcher<QByteArray>::finished, this, [this, watcher, targetCityId, requestSeq]() {
+        const QByteArray cacheJson = watcher->result();
+        watcher->deleteLater();
+        if (requestSeq != activeRequestSeq) {
+            return;
+        }
+        if (!cacheJson.isEmpty()) {
+            cityId = targetCityId;
+            parseweatherJson(cacheJson);
+            return;
+        }
+        requestWeatherByCityId(targetCityId, requestSeq);
+    });
+}
+
+void weatherAPI::getCityId(const QString &cityName, quint64 requestSeq)
 {
     QString urlString = QString(kWeatherCityLookupUrl)
                             .arg(cityName)
@@ -177,10 +224,16 @@ void weatherAPI::getCityId(const QString &cityName)
     QNetworkReply *reply = manager->get(request);
     reply->setProperty(kRequestTypeKey, kRequestTypeCityLookup);
     reply->setProperty(kRequestCityNameKey, cityName);
+    reply->setProperty(kRequestSeqKey, QVariant::fromValue<qulonglong>(requestSeq));
 }
 
 void weatherAPI::onReplyFinished(QNetworkReply *reply)
 {
+    const quint64 requestSeq = reply->property(kRequestSeqKey).toULongLong();
+    if (requestSeq != 0 && requestSeq != activeRequestSeq) {
+        reply->deleteLater();
+        return;
+    }
     if (reply->property(kRequestTypeKey).toString() == kRequestTypeCityLookup) {
         onCitySearchFinished(reply);
         return;
@@ -203,6 +256,11 @@ void weatherAPI::onReplyFinished(QNetworkReply *reply)
 
 void weatherAPI::onCitySearchFinished(QNetworkReply *reply)
 {
+    const quint64 requestSeq = reply->property(kRequestSeqKey).toULongLong();
+    if (requestSeq != 0 && requestSeq != activeRequestSeq) {
+        reply->deleteLater();
+        return;
+    }
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
         QJsonDocument doc = QJsonDocument::fromJson(data);
@@ -214,7 +272,9 @@ void weatherAPI::onCitySearchFinished(QNetworkReply *reply)
                 if (!queriedCityId.isEmpty()) {
                     cityId = queriedCityId;
                     const QString cityName = reply->property(kRequestCityNameKey).toString();
-                    saveCityIdCache(cityName, cityId);
+                    if (cityData) {
+                        cityData->addDate(cityName, cityId);
+                    }
                     QString weatherUrl = QString(kWeatherApi7dUrl)
                                              .arg(cityId)
                                              .arg(kWeatherApiKey);
@@ -222,6 +282,7 @@ void weatherAPI::onCitySearchFinished(QNetworkReply *reply)
                     QNetworkReply *weatherReply = manager->get(request);
                     weatherReply->setProperty(kRequestTypeKey, kRequestTypeWeather);
                     weatherReply->setProperty(kRequestCityIdKey, cityId);
+                    weatherReply->setProperty(kRequestSeqKey, QVariant::fromValue<qulonglong>(requestSeq));
                 }
             }
         }
@@ -284,7 +345,14 @@ void weatherAPI::parseweatherJson(const QByteArray &jsonData)
     if (weatherCache.fromJson(jsonData))
     {
         const QString weatherKey = cityId.isEmpty() ? kDefaultCityId : cityId;
-        cacheData->save(weatherKey, weatherCache);
+        // 缓存写入走全局线程池，避免主线程在磁盘写入时出现卡顿。
+        auto weatherCacheCopy = weatherCache;
+        auto *cache = cacheData.get();
+        QtConcurrent::run(AppThreadPool::globalPool(), [cache, weatherKey, weatherCacheCopy]() mutable {
+            if (cache) {
+                cache->save(weatherKey, weatherCacheCopy);
+            }
+        });
     }
     emit weatherDataReady(weekForecast);
 }

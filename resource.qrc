@@ -1,16 +1,16 @@
 <RCC>
     <qresource prefix="/">
-        <file>Resource/app/app_icon.jpg</file>
-        <file>Resource/app/weather_app.png</file>
-        <file>Resource/app/music_app.png</file>
-        <file>Resource/app/music_app_alt.png</file>
-        <file>Resource/app/map_app.png</file>
-        <file>Resource/app/video_app.png</file>
-        <file>Resource/app/settings_app.png</file>
-        <file>Resource/app/weather_background.jpg</file>
-        <file>Resource/app/weather_background_fallback.jpg</file>
-        <file>Resource/app/search.svg</file>
-        <file>Resource/app/close.svg</file>
+        <file>Resource/app/common/app_icon.jpg</file>
+        <file>Resource/app/weather/icon.png</file>
+        <file>Resource/app/music/icon.png</file>
+        <file>Resource/app/music/icon_alt.png</file>
+        <file>Resource/app/map/icon.png</file>
+        <file>Resource/app/video/icon.png</file>
+        <file>Resource/app/setting/icon.png</file>
+        <file>Resource/app/weather/background.jpg</file>
+        <file>Resource/app/weather/background_fallback.jpg</file>
+        <file>Resource/app/weather/search.svg</file>
+        <file>Resource/app/weather/close.svg</file>
         <file>Resource/weatherIcons/100.svg</file>
         <file>Resource/weatherIcons/100-fill.svg</file>
         <file>Resource/weatherIcons/101.svg</file>
@@ -518,5 +518,54 @@
         <file>Resource/weatherIcons/9999.svg</file>
         <file>Resource/weatherIcons/qweather.svg</file>
         <file>Resource/weatherIcons/qweather-fill.svg</file>
+        <file>Resource/app/music/bofangduilie.png</file>
+        <file>Resource/app/music/bofangliebiao.png</file>
+        <file>Resource/app/music/bofangMV.png</file>
+        <file>Resource/app/music/bofangzhong.png</file>
+        <file>Resource/app/music/CD.png</file>
+        <file>Resource/app/music/danquxunhuan.png</file>
+        <file>Resource/app/music/diantai.png</file>
+        <file>Resource/app/music/erji.png</file>
+        <file>Resource/app/music/gengduo.png</file>
+        <file>Resource/app/music/huiyuanzhuanxiang.png</file>
+        <file>Resource/app/music/jubao.png</file>
+        <file>Resource/app/music/kuaijin.png</file>
+        <file>Resource/app/music/kuaitui.png</file>
+        <file>Resource/app/music/liebiaoxunhuan.png</file>
+        <file>Resource/app/music/lishibofang.png</file>
+        <file>Resource/app/music/luyin.png</file>
+        <file>Resource/app/music/pinglun.png</file>
+        <file>Resource/app/music/shangyiqu.png</file>
+        <file>Resource/app/music/shipin.png</file>
+        <file>Resource/app/music/shoucang.png</file>
+        <file>Resource/app/music/shunxubofang.png</file>
+        <file>Resource/app/music/suijibofang.png</file>
+        <file>Resource/app/music/tianjiadao.png</file>
+        <file>Resource/app/music/tinggeshiqu.png</file>
+        <file>Resource/app/music/tuichu.png</file>
+        <file>Resource/app/music/xiayiqu.png</file>
+        <file>Resource/app/music/xiazai.png</file>
+        <file>Resource/app/music/yinleguan.png</file>
+        <file>Resource/app/music/yinliang.png</file>
+        <file>Resource/app/music/zanting.png</file>
+        <file>Resource/app/video/close-2.png</file>
+        <file>Resource/app/video/download.png</file>
+        <file>Resource/app/video/fullscreen-enter.png</file>
+        <file>Resource/app/video/fullscreen-exit.png</file>
+        <file>Resource/app/video/lock.png</file>
+        <file>Resource/app/video/pause.png</file>
+        <file>Resource/app/video/play.png</file>
+        <file>Resource/app/video/play-next.png</file>
+        <file>Resource/app/video/play-previous.png</file>
+        <file>Resource/app/video/reload.png</file>
+        <file>Resource/app/video/repeat.png</file>
+        <file>Resource/app/video/rewind-back.png</file>
+        <file>Resource/app/video/rewind-forward.png</file>
+        <file>Resource/app/video/settings.png</file>
+        <file>Resource/app/video/sound-off.png</file>
+        <file>Resource/app/video/sound-on.png</file>
+        <file>Resource/app/video/unlock.png</file>
+        <file>Resource/app/video/volume-down.png</file>
+        <file>Resource/app/video/volume-up.png</file>
     </qresource>
 </RCC>

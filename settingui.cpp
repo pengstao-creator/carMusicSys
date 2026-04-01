@@ -5,7 +5,7 @@
 
 namespace {
 constexpr const char * APP_SETTING = "setting";
-constexpr const char * SETTING_ICON = ":/Resource/app/settings_app.png";
+constexpr const char * SETTING_ICON = ":/Resource/app/setting/icon.png";
 }
 
 settingUi::settingUi(QWidget *parent)

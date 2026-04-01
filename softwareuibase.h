@@ -9,7 +9,7 @@ class QPaintEvent;
 class QPixmap;
 class QResizeEvent;
 class QString;
-
+class QLabel;
 class softwareUiBase : public QWidget
 {
     Q_OBJECT
@@ -31,10 +31,11 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void onUiScaleChanged(qreal scaleFactor);
-
+    QLabel * backgroundLabel;
 private:
     QSize m_designSize;
     qreal m_uiScaleFactor;
+
 };
 
 #endif // SOFTWAREUIBASE_H

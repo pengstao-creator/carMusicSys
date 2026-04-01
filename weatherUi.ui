@@ -14,9 +14,7 @@
    <string>WeatherUi</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#WeatherUi {
-    border-image: url(:/Resource/app/weather_background.jpg) 0 0 0 0 stretch stretch;
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <property name="leftMargin">
@@ -51,7 +49,7 @@
         <string notr="true">QPushButton {
     background: transparent;
     border: none;
-    image: url(:/Resource/app/search.svg);
+    image: url(:/Resource/app/weather/search.svg);
 }
 QPushButton:hover { background: transparent; border: none; }
 QPushButton:pressed { background: transparent; border: none; }</string>
@@ -110,7 +108,7 @@ QPushButton:pressed { background: transparent; border: none; }</string>
            <string notr="true">QPushButton {
     background: transparent;
     border: none;
-    image: url(:/Resource/app/search.svg);
+    image: url(:/Resource/app/weather/search.svg);
 }
 QPushButton:hover { background: transparent; border: none; }
 QPushButton:pressed { background: transparent; border: none; }</string>
@@ -131,16 +129,10 @@ QPushButton:pressed { background: transparent; border: none; }</string>
        <property name="text">
         <string>成都市天气</string>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
-       </property>
       </widget>
      </item>
      <item>
       <spacer name="horizontalSpacerTopBar">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
@@ -167,7 +159,7 @@ QPushButton:pressed { background: transparent; border: none; }</string>
         <string notr="true">QPushButton {
     background: transparent;
     border: none;
-    image: url(:/Resource/app/close.svg);
+    image: url(:/Resource/app/weather/close.svg);
 }
 QPushButton:hover {
     background: transparent;
@@ -191,13 +183,13 @@ QPushButton:pressed {
       <string notr="true">QScrollArea { background: transparent; border: none; }</string>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Shape::NoFrame</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+      <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
      <property name="widgetResizable">
       <bool>true</bool>
@@ -208,7 +200,7 @@ QPushButton:pressed {
         <x>0</x>
         <y>0</y>
         <width>1210</width>
-        <height>292</height>
+        <height>288</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -274,9 +266,6 @@ QPushButton:pressed {
             <property name="text">
              <string>周一 3/24</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
            </widget>
           </item>
           <item>
@@ -298,11 +287,11 @@ QPushButton:pressed {
                 <height>32</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
               <property name="text">
                <string>☀</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -337,11 +326,11 @@ QPushButton:pressed {
                 <height>32</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
               <property name="text">
                <string>☾</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -401,9 +390,6 @@ QPushButton:pressed {
             <property name="text">
              <string>周二 3/25</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
            </widget>
           </item>
           <item>
@@ -427,9 +413,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☀</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -466,9 +449,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☾</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -528,9 +508,6 @@ QPushButton:pressed {
             <property name="text">
              <string>周三 3/26</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
            </widget>
           </item>
           <item>
@@ -554,9 +531,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☀</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -593,9 +567,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☾</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -655,9 +626,6 @@ QPushButton:pressed {
             <property name="text">
              <string>周四 3/27</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
            </widget>
           </item>
           <item>
@@ -681,9 +649,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☀</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -720,9 +685,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☾</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -782,9 +744,6 @@ QPushButton:pressed {
             <property name="text">
              <string>周五 3/28</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
            </widget>
           </item>
           <item>
@@ -808,9 +767,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☀</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -847,9 +803,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☾</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -909,9 +862,6 @@ QPushButton:pressed {
             <property name="text">
              <string>周六 3/29</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
            </widget>
           </item>
           <item>
@@ -935,9 +885,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☀</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -974,9 +921,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☾</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -1036,9 +980,6 @@ QPushButton:pressed {
             <property name="text">
              <string>周日 3/30</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
            </widget>
           </item>
           <item>
@@ -1062,9 +1003,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☀</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -1101,9 +1039,6 @@ QPushButton:pressed {
               </property>
               <property name="text">
                <string>☾</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>

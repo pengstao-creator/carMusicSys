@@ -69,7 +69,7 @@ void softwareControl::openSoftware(const QString &name)
         if(zAxisCtrl->getOverlay(name) == nullptr)
         {
             //添加软件窗口
-            zAxisCtrl->addOvrlay(name,softWidget);
+            zAxisCtrl->addOvrlay(name,softWidget,true);
             connect(softWidget,&softwareUiBase::exit,this,[this,softWidget](){
                 zAxisCtrl->wallpaperStart();
                 if(softWidget)softWidget->hide();

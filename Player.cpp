@@ -33,6 +33,9 @@ Player::Player(QObject *parent)
     , m_movie(nullptr)
     , m_MovieItem(nullptr)
     , m_mediaPlayer(nullptr)
+    #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    , m_audioOutput(nullptr)        // 音频输出
+    #endif
     , ptype(PlayerType::NONPLAYER)
     , m_lastVideoSize()
     , m_videoSignalsConnected(false)
@@ -49,9 +52,6 @@ void Player::setWallpaperPlayer(const qreal z = Layer::LAYER_PLAYER_1)
 {
     setPixmapPlayer(z);
     setVideoPlayer(z);
-
-
-
     // 初始隐藏所有播放器
     hidePlayer(PlayerType::NONPLAYER);
 }

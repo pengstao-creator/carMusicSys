@@ -43,21 +43,20 @@ private:
     void setupUI();
     void rebuildWeatherCards();
     void scheduleRebuildCards();
-
-    QScrollArea *scrollArea;
-    QWidget *scrollContent;
-    QHBoxLayout *cardsLayout;
-    QVector<QWidget*> dayCards;
-    weatherAPI *weatherService;
-    QString backgroundImagePath;
-    QVector<QVector<QString>> latestForecast;
-    QString currentCityName;
-    QString pendingCityName;
-    QLabel *errorTipLabel;
-    QLabel *backgroundLabel;
-    QPixmap backgroundPixmap;
-    QTimer *errorTipTimer;
-    bool rebuildPending;
+    void setSvgLabelIcon(QLabel *label, const QString &iconPath, int iconSize);
+    QScrollArea *scrollArea;                  // 天气卡片横向滚动区域
+    QWidget *scrollContent;                   // 滚动区域内容容器
+    QHBoxLayout *cardsLayout;                 // 天气卡片横向布局
+    QVector<QWidget*> dayCards;               // 7天卡片控件集合
+    weatherAPI *weatherService;               // 天气服务对象（负责网络请求与数据解析）
+    QString backgroundImagePath;              // 当前背景图片路径
+    QVector<QVector<QString>> latestForecast; // 最近一次天气预报数据缓存
+    QString currentCityName;                  // 当前展示城市名
+    QString pendingCityName;                  // 待切换城市名（请求成功后再提交）
+    QLabel *errorTipLabel;                    // 错误提示标签
+    QPixmap backgroundPixmap;                 // 背景图片缓存
+    QTimer *errorTipTimer;                    // 错误提示自动隐藏定时器
+    bool rebuildPending;                      // 是否已有卡片重建任务在排队
     Ui::WeatherUi *ui;
 };
 

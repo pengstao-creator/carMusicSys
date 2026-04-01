@@ -5,7 +5,7 @@
 
 namespace {
 constexpr const char * APP_AMAP = "amap";
-constexpr const char * AMAP_ICON = ":/Resource/app/map_app.png";
+constexpr const char * AMAP_ICON = ":/Resource/app/map/icon.png";
 }
 
 mapUi::mapUi(QWidget *parent)

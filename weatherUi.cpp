@@ -36,32 +36,16 @@ constexpr int kDateFontSize = 14;
 constexpr int kTextFontSize = 12;
 constexpr int kDayCardCount = 7;
 constexpr const char *kDefaultCityName = "成都";
-constexpr const char * WEATHER_BACKGROUND = ":/Resource/app/weather_background.jpg"; // 天气模块背景图文件名
+constexpr const char * WEATHER_BACKGROUND = ":/Resource/app/common/app_icon.jpg"; // 天气模块背景图文件名
 constexpr const char * APP_WEATHER = "weather"; // 应用标识：天气
-constexpr const char * WEATHER_ICON = ":/Resource/app/weather_app.png";
-
-void setSvgLabelIcon(QLabel *label, const QString &iconPath, int iconSize)
-{
-    if (!label) return;
-    label->setFixedSize(iconSize, iconSize);
-
-    QPixmap pixmap(iconSize, iconSize);
-    pixmap.fill(Qt::transparent);
-
-    QSvgRenderer renderer(iconPath);
-    if (renderer.isValid()) {
-        QPainter painter(&pixmap);
-        renderer.render(&painter);
-        label->setPixmap(pixmap.scaled(iconSize, iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
+constexpr const char * WEATHER_ICON = ":/Resource/app/weather/icon.png";
 }
-}
+
 
 WeatherUi::WeatherUi(QWidget *parent) : softwareUiBase(parent)
     , weatherService(new weatherAPI(this))
     , currentCityName(QString::fromUtf8(kDefaultCityName))
     , errorTipLabel(nullptr)
-    , backgroundLabel(nullptr)
     , errorTipTimer(new QTimer(this))
     , rebuildPending(false)
     , ui(new Ui::WeatherUi)
@@ -114,15 +98,6 @@ void WeatherUi::setupUI()
     // 设置窗口对象名，用于样式表
     setObjectName("weatherMainWidget");
     setAttribute(Qt::WA_StyledBackground, true);
-    // 增加一层底图 QLabel（放在最底层）：
-    // 在 Qt5 + QGraphicsProxyWidget 场景中，纯样式背景可能被视口/子控件覆盖，
-    // 因此使用真实像素层作为第一重保障。
-    backgroundLabel = new QLabel(this);
-    backgroundLabel->setGeometry(rect());
-    backgroundLabel->setScaledContents(false);
-    backgroundLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    backgroundLabel->lower();
-
     // 获取UI中的滚动区域、内容容器和卡片布局
     scrollArea = ui->weatherScrollArea;
     scrollContent = ui->weatherScrollContent;
@@ -206,6 +181,11 @@ void WeatherUi::scheduleRebuildCards()
 
 void WeatherUi::rebuildWeatherCards()
 {
+    // 防御式保护：当 UI 结构变化或对象名不匹配时，避免空指针崩溃。
+    if (!cardsLayout || !scrollContent) {
+        return;
+    }
+
     for (const QVector<QString> &dayData : latestForecast) {
         Q_UNUSED(dayData);
     }
@@ -303,15 +283,6 @@ void WeatherUi::setBackground(const QString &backgroundPath)
     // - 同时将最终可用图设置到 label + palette + stylesheet，三重兜底。
     backgroundImagePath = backgroundPath;
     backgroundPixmap = QPixmap(backgroundImagePath);
-    if (backgroundPixmap.isNull()) {
-        // 回退背景用于保证“至少可见”：
-        // 即便 PNG 解码失败，天气页依然有背景，不影响主流程体验。
-        const QString fallbackPath = QString::fromUtf8(WEATHER_BACKGROUND);
-        backgroundPixmap = QPixmap(fallbackPath);
-        if (!backgroundPixmap.isNull()) {
-            backgroundImagePath = fallbackPath;
-        }
-    }
     if (backgroundLabel) {
         if (!backgroundPixmap.isNull()) {
             const QPixmap scaled = backgroundPixmap.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
@@ -336,16 +307,24 @@ void WeatherUi::setBackground(const QString &backgroundPath)
         "QScrollArea > QWidget > QWidget { background: transparent; }")
         .arg(backgroundImagePath);
     setStyleSheet(style);
-    // 关键诊断日志：
-    // exists=true 但 pixmapNull=true 通常意味着运行时图像解码插件缺失。
-    qDebug() << "WeatherUi::setBackground" << backgroundImagePath << "exists" << QFileInfo(backgroundImagePath).exists() << "pixmapNull" << backgroundPixmap.isNull() << "size" << backgroundPixmap.size();
-    if (backgroundPixmap.isNull()) {
-        qDebug() << "WeatherUi::imageFormats" << QImageReader::supportedImageFormats();
-    }
-    update();
+
 }
 
+void WeatherUi::setSvgLabelIcon(QLabel *label, const QString &iconPath, int iconSize)
+{
+    if (!label) return;
+    label->setFixedSize(iconSize, iconSize);
 
+    QPixmap pixmap(iconSize, iconSize);
+    pixmap.fill(Qt::transparent);
+
+    QSvgRenderer renderer(iconPath);
+    if (renderer.isValid()) {
+        QPainter painter(&pixmap);
+        renderer.render(&painter);
+        label->setPixmap(pixmap.scaled(iconSize, iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+}
 
 const QString &WeatherUi::getSoftname()
 {
@@ -394,6 +373,9 @@ void WeatherUi::on_exitButton_clicked()
 void WeatherUi::on_searchButton_clicked()
 {
     qDebug() << "WeatherUi::on_searchButton_clicked" << this;
+    if (!ui->searchButton || !ui->searchPanel) {
+        return;
+    }
     // 切换搜索面板的可见状态
     ui->searchButton->hide();
     const bool show = !ui->searchPanel->isVisible();
@@ -408,12 +390,19 @@ void WeatherUi::on_searchButton_clicked()
 void WeatherUi::on_confirmSearchButton_clicked()
 {
     qDebug() << "WeatherUi::on_confirmSearchButton_clicked" << this;
+    if (!ui->searchPanel || !ui->searchButton) {
+        return;
+    }
     // 检查城市输入框是否存在
     if (!ui->cityLineEdit) {
         return;
     }
     // 获取并修剪输入的城市名
     const QString city = ui->cityLineEdit->text().trimmed();
+    //如果当前城市与输入城市相同，直接返回
+    if (currentCityName == city) {
+        return;
+    }
     if (!city.isEmpty()) {
         pendingCityName = city;
         // 调用天气服务获取该城市的天气
@@ -421,6 +410,7 @@ void WeatherUi::on_confirmSearchButton_clicked()
     }
 
     // 隐藏搜索面板
+    ui->cityLineEdit->clear();
     ui->searchPanel->setVisible(false);
     ui->searchButton->show();
 }

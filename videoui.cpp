@@ -5,7 +5,7 @@
 
 namespace {
 constexpr const char * APP_BILIBILI = "bilibili";
-constexpr const char * BILIBILI_ICON = ":/Resource/app/video_app.png";
+constexpr const char * BILIBILI_ICON = ":/Resource/app/video/icon.png";
 }
 
 videoUi::videoUi(QWidget *parent)

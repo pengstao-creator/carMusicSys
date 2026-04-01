@@ -6,13 +6,22 @@
 #include <QResizeEvent>
 #include <QString>
 #include <QtGlobal>
-
+#include <QLabel>
 softwareUiBase::softwareUiBase(QWidget *parent)
     : QWidget(parent)
     , m_designSize(800, 400)
     , m_uiScaleFactor(1.0)
 {
+    setGeometry(0,0,800,400);
     setAttribute(Qt::WA_NoMousePropagation, true);
+    // 增加一层底图 QLabel（放在最底层）：
+    // 在 Qt5 + QGraphicsProxyWidget 场景中，纯样式背景可能被视口/子控件覆盖，
+    backgroundLabel = new QLabel(this);
+    backgroundLabel->setGeometry(rect());
+    backgroundLabel->setScaledContents(false);
+    backgroundLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    backgroundLabel->setStyleSheet("background-color: rgb(255, 255, 255);");
+    backgroundLabel->lower();
 }
 
 qreal softwareUiBase::uiScaleFactor() const
