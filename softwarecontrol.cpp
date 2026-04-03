@@ -8,7 +8,9 @@
 #include "softwareuibase.h"
 #include "Overlay.h"
 #include "zaxiscontrol.h"
+#include <QCoreApplication>
 #include <QIcon>
+#include <QResizeEvent>
 #include <QString>
 #include <QDebug>
 softwareControl::softwareControl(zAxisControl * zAxis_Ctrl,QObject *parent)
@@ -74,6 +76,20 @@ void softwareControl::openSoftware(const QString &name)
                 zAxisCtrl->wallpaperStart();
                 if(softWidget)softWidget->hide();
             });
+            connect(zAxisCtrl,&zAxisControl::resized,softWidget,[this,softWidget](){
+                if(!softWidget || !zAxisCtrl) return;
+                const QSize newSize = zAxisCtrl->getQRect().size().toSize();
+                if(!newSize.isValid()) return;
+                const QSize oldSize = softWidget->size();
+                if(oldSize == newSize) return;
+                softWidget->resize(newSize);
+                QResizeEvent event(newSize, oldSize);
+                QCoreApplication::sendEvent(softWidget, &event);
+            });
+            const QSize initSize = zAxisCtrl->getQRect().size().toSize();
+            if (initSize.isValid()) {
+                softWidget->resize(initSize);
+            }
         }
         else
         {

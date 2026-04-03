@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 #endif
     
     // // 禁用所有Qt日志输出
-    QLoggingCategory::setFilterRules("*.debug=false\n*.info=false\n*.warning=false\n*.critical=false");
+//    QLoggingCategory::setFilterRules("*.debug=false\n*.info=false\n*.warning=false\n*.critical=false");
     #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     qputenv("QT_MULTIMEDIA_PREFERRED_PLUGINS", "ffmpeg,windows");
     qputenv("QT_FFMPEG_DECODING_HW_DEVICE_TYPES", "d3d11va,dxva2");

@@ -18,6 +18,7 @@ settingUi::settingUi(QWidget *parent)
 settingUi::~settingUi()
 {
     delete ui;
+
 }
 
 const QString &settingUi::getSoftname()

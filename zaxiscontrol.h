@@ -27,15 +27,13 @@ signals:
     void wallpaperStop();
     void wallpaperStart();
     void wallpaperPause();
+    void resized();
 protected:
     void resizeEvent(QResizeEvent *event) override;
 private:
         void setBaseQWidget();
     QGraphicsScene * m_scene;
-    QHash<QString,Overlay*> m_overlay;
-
-signals:
-    void resized();
+    QHash<QString,Overlay*> m_overlay;   
 };
 
 #endif // ZAXISCONTROL_H

@@ -10,11 +10,17 @@
     <height>400</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>400</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>settingUi</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item alignment="Qt::AlignTop|Qt::AlignRight">
+   <item alignment="Qt::AlignRight|Qt::AlignTop">
     <widget class="QToolButton" name="exitButton">
      <property name="text">
       <string>⨯</string>

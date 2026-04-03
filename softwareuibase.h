@@ -21,17 +21,17 @@ public:
     static const QString& getSoftname();
     static const QPixmap& getSofticon();
     static softwareUiBase * getSingleton();
-signals:
-    void exit();
-
-protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+signals:
+    void exit();   
+protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void onUiScaleChanged(qreal scaleFactor);
     QLabel * backgroundLabel;
+    QPixmap backgroundPixmap;
 private:
     QSize m_designSize;
     qreal m_uiScaleFactor;

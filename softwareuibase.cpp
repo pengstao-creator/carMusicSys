@@ -67,12 +67,26 @@ void softwareUiBase::paintEvent(QPaintEvent *event)
 void softwareUiBase::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+    if (backgroundLabel) {
+        backgroundLabel->setGeometry(rect());
+    }
+    if (!backgroundPixmap.isNull()) {
+        const QPixmap scaled = backgroundPixmap.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        if (backgroundLabel) {
+            backgroundLabel->setPixmap(scaled);
+        }
+        QPalette pal = palette();
+        pal.setBrush(QPalette::Window, QBrush(scaled));
+        setPalette(pal);
+        setAutoFillBackground(true);
+    }
+
+
     const qreal widthScale = static_cast<qreal>(width()) / m_designSize.width();
     const qreal heightScale = static_cast<qreal>(height()) / m_designSize.height();
     m_uiScaleFactor = qMax<qreal>(0.1, qMin(widthScale, heightScale));
     onUiScaleChanged(m_uiScaleFactor);
 }
-
 void softwareUiBase::mousePressEvent(QMouseEvent *event)
 {
     event->accept();

@@ -14,8 +14,8 @@
 wallpaerWidget::wallpaerWidget(zAxisControl *zAxisCtrl,QObject *parent)
     : QObject(parent)
     , zAxis_Ctrl(zAxisCtrl)
-    , m_player_1(std::make_unique<Player>())
-    , m_player_2(std::make_unique<Player>())
+    , m_player_1(std::make_unique<VideoWallpaperPlayer>())
+    , m_player_2(std::make_unique<VideoWallpaperPlayer>())
     , is_player_1(true)
     , ptype(PlayerType::NONPLAYER)
 {
@@ -43,7 +43,7 @@ void wallpaerWidget::setPlayer()
     m_player_2->hidePlayer(PlayerType::NONPLAYER);
 
     // 视频加载完成后统一按当前场景尺寸调整，避免首次显示尺寸异常。
-    auto setupVideoItem = [this](Player* player) {
+    auto setupVideoItem = [this](VideoWallpaperPlayer* player) {
         connect(player->getMediaPlayer(), &QMediaPlayer::mediaStatusChanged, this,
                 [this, player](QMediaPlayer::MediaStatus status) {
                     if (status == QMediaPlayer::LoadedMedia || status == QMediaPlayer::BufferedMedia) {
@@ -136,8 +136,8 @@ void wallpaerWidget::setPath(const QString &filePath)
         return;
     }
 
-    Player* currentPlayer = is_player_1 ? m_player_1.get() : m_player_2.get();
-    Player* standbyPlayer = is_player_1 ? m_player_2.get() : m_player_1.get();
+    VideoWallpaperPlayer* currentPlayer = is_player_1 ? m_player_1.get() : m_player_2.get();
+    VideoWallpaperPlayer* standbyPlayer = is_player_1 ? m_player_2.get() : m_player_1.get();
 
     // 切换顺序：
     // 1) 先展示后台待机播放器（其内容已提前准备）
@@ -155,7 +155,7 @@ void wallpaerWidget::setPath(const QString &filePath)
 
 }
 
-void wallpaerWidget::setBackground(const QString &filePath1,Player * player)
+void wallpaerWidget::setBackground(const QString &filePath1,VideoWallpaperPlayer * player)
 {
     QFileInfo info(filePath1);
     QString suffix = info.suffix().toLower();
@@ -196,7 +196,7 @@ void wallpaerWidget::resizeEvent()
     }
     m_lastSceneSize = targetSize;
 
-    auto adjustPlayer = [this](Player* player) {
+    auto adjustPlayer = [this](VideoWallpaperPlayer* player) {
         if (!player) return;
         const auto type = player->getCurrentPlayerType();
         if (type == PlayerType::VIDEO) {

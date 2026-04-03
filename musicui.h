@@ -2,13 +2,12 @@
 #define MUSICUI_H
 
 #include "softwareuibase.h"
-
+#include "AppMusicPlayer.h"
 #include <QStringList>
 #include <QVector>
-#include <QSet>
-class QAudioOutput;  // 前向声明Qt音频输出类
-class QMediaPlayer;  // 前向声明Qt媒体播放器类
+#include <QHash>
 class QListWidgetItem;  // 前向声明Qt列表项类
+
 namespace Ui {
 class musicUi;  // 前向声明UI类
 }
@@ -55,30 +54,22 @@ private:
         Random       // 随机播放
     };
 
-    struct MusicInfo
-    {
-        double Duration;
-        QString Title;
-        QString Artist;
-        QString filepath;
-    };
+
 
     void initSet();
     void setBackground(const QString& iconpath);
-
+    void setMusicUi();
 
 
     Ui::musicUi *ui;  // UI对象指针
-    QMediaPlayer *player;  // 媒体播放器指针
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    QAudioOutput *audioOutput;  // Qt6音频输出指针
-#endif    
-    QList<MusicInfo> musicInfos;//所有添加音乐的信息
-    QSet<QString> musicPaths;//用于根据文件路径进行去重
     int currentIndex;  // 当前播放索引
-    QVector<std::pair<PlayMode,QPixmap>> playMode;  // 播放模式
     int modeIndex;
     bool userSeeking;  // 用户是否正在拖动进度条
+    AppMusicPlayer * player;
+    QList<QString> musicFilePaths;//保存音乐完整路径用
+    QHash<QString,int> OncePaths;//用于根据文件路径进行去重，和歌名快速搜索返回索引
+    QVector<std::pair<PlayMode,QPixmap>> playMode;  // 播放模式
+    QPixmap dcoverArt;
 };
 
 #endif // MUSICUI_H

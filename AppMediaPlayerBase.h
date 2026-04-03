@@ -18,7 +18,7 @@ public:
 
     QMediaPlayer *playerHandle() const;
 
-    void setSource(const QUrl &url);
+    void setSource(const QString &url);
     void play();
     void pause();
     void stop();

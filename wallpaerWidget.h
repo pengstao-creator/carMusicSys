@@ -6,8 +6,7 @@
 #include <QSize>
 #include <memory>
 
-//前置声明,防止头文件循环包含和减少编译依赖，加快编译速度
-class Player;
+class VideoWallpaperPlayer;
 enum class PlayerType;
 class zAxisControl;
 class wallpaerWidget : public QObject
@@ -28,12 +27,12 @@ protected:
     void resizeEvent() ;
 private:
     void setPlayer();
-    void setBackground(const QString &filePath,Player * player);
+    void setBackground(const QString &filePath,VideoWallpaperPlayer * player);
 
 
     zAxisControl *zAxis_Ctrl;
-    std::unique_ptr<Player> m_player_1;            // 播放器
-    std::unique_ptr<Player> m_player_2;
+    std::unique_ptr<VideoWallpaperPlayer> m_player_1;
+    std::unique_ptr<VideoWallpaperPlayer> m_player_2;
     bool is_player_1;
     PlayerType ptype;
     QString m_currentFile;              // 当前文件路径

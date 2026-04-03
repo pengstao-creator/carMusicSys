@@ -27,8 +27,6 @@ public:
     static softwareUiBase*getSingleton() ;
     void updateWeather(const QVector<QVector<QString>> &weekForecast);
     void setBackground(const QString &backgroundPath);
-
-protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 

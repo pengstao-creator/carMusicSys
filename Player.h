@@ -22,22 +22,18 @@ enum class PlayerType {
     VIDEO
 };
 
-class Player : public QObject
+class VideoWallpaperPlayer : public QObject
 {
     Q_OBJECT
 public:
-    explicit Player(QObject *parent = nullptr);
-    ~Player();
+    explicit VideoWallpaperPlayer(QObject *parent = nullptr);
+    ~VideoWallpaperPlayer();
     
     void setupPixmap(const QString &path, const QSize &targetSize);   // 静态图片
     void refreshPixmap(const QSize &targetSize);
     void setupMovie(const QString &path);    // GIF
     void setupVideo(const QString &path);    // MP4
     void setWallpaperPlayer(const qreal z);
-    void setPixmapPlayer(const qreal z);
-    void setVideoPlayer(const qreal z);
-    void setMoviePlayer(const qreal z);
-    void setAudioPlayer();
     void pause();
     void stop();
     void play();
@@ -54,6 +50,10 @@ public:
     void setVideoSize(const QSize &size);
 
 private:
+    void setPixmapPlayer(const qreal z);
+    void setVideoPlayer(const qreal z);
+    void setMoviePlayer(const qreal z);
+    void setAudioPlayer();
     void applyCachedPixmap(const QString &path, const QSize &targetSize);
     std::unique_ptr<QGraphicsPixmapItem> m_pixmapItem;  // 静态图片项
     std::unique_ptr<QGraphicsVideoItem> m_videoItem;    // 视频项

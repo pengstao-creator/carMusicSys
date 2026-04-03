@@ -26,7 +26,7 @@ QString buildScaledCacheKey(const QString &path, const QSize &targetSize)
 }
 }
 
-Player::Player(QObject *parent)
+VideoWallpaperPlayer::VideoWallpaperPlayer(QObject *parent)
     : QObject(parent)
     , m_pixmapItem(nullptr)
     , m_videoItem(nullptr)
@@ -43,12 +43,12 @@ Player::Player(QObject *parent)
 {
 }
 
-Player::~Player()
+VideoWallpaperPlayer::~VideoWallpaperPlayer()
 {
     // 智能指针会自动管理内存，不需要手动释放
 }
 
-void Player::setWallpaperPlayer(const qreal z = Layer::LAYER_PLAYER_1)
+void VideoWallpaperPlayer::setWallpaperPlayer(const qreal z)
 {
     setPixmapPlayer(z);
     setVideoPlayer(z);
@@ -56,7 +56,7 @@ void Player::setWallpaperPlayer(const qreal z = Layer::LAYER_PLAYER_1)
     hidePlayer(PlayerType::NONPLAYER);
 }
 
-void Player::setPixmapPlayer(const qreal z)
+void VideoWallpaperPlayer::setPixmapPlayer(const qreal z)
 {
     if (!m_pixmapItem) {
         m_pixmapItem = std::make_unique<QGraphicsPixmapItem>();
@@ -66,7 +66,7 @@ void Player::setPixmapPlayer(const qreal z)
 
 }
 
-void Player::setVideoPlayer(const qreal z)
+void VideoWallpaperPlayer::setVideoPlayer(const qreal z)
 {
     if (!m_videoItem) {
         m_videoItem = std::make_unique<QGraphicsVideoItem>();
@@ -101,7 +101,7 @@ void Player::setVideoPlayer(const qreal z)
 
 }
 
-void Player::setMoviePlayer(const qreal z)
+void VideoWallpaperPlayer::setMoviePlayer(const qreal z)
 {
     if (!m_MovieItem) {
         m_MovieItem = std::make_unique<QGraphicsPixmapItem>();
@@ -125,7 +125,7 @@ void Player::setMoviePlayer(const qreal z)
     }
 }
 
-void Player::setAudioPlayer()
+void VideoWallpaperPlayer::setAudioPlayer()
 {
     #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     if (!m_audioOutput) {
@@ -134,25 +134,25 @@ void Player::setAudioPlayer()
     #endif
 }
 
-void Player::pause()
+void VideoWallpaperPlayer::pause()
 {
     if(!m_mediaPlayer)return;
     m_mediaPlayer->pause();
 }
 
-void Player::stop()
+void VideoWallpaperPlayer::stop()
 {
     if(!m_mediaPlayer)return;
     m_mediaPlayer->stop();
 }
 
-void Player::play()
+void VideoWallpaperPlayer::play()
 {
     if(!m_mediaPlayer)return;
     m_mediaPlayer->play();
 }
 
-bool Player::hidePlayer(PlayerType type)
+bool VideoWallpaperPlayer::hidePlayer(PlayerType type)
 {
     if(type == PlayerType::VIDEO)
     {
@@ -185,7 +185,7 @@ bool Player::hidePlayer(PlayerType type)
     return true;
 }
 
-bool Player::showPlayer(PlayerType type)
+bool VideoWallpaperPlayer::showPlayer(PlayerType type)
 {
     if(type == PlayerType::VIDEO)
     {
@@ -210,7 +210,7 @@ bool Player::showPlayer(PlayerType type)
 
 
 
-void Player::setupPixmap(const QString &path, const QSize &targetSize)
+void VideoWallpaperPlayer::setupPixmap(const QString &path, const QSize &targetSize)
 {
     setPixmapPlayer(Layer::LAYER_PLAYER_1);
     ptype = PlayerType::PIXMAP;
@@ -218,7 +218,7 @@ void Player::setupPixmap(const QString &path, const QSize &targetSize)
     applyCachedPixmap(path, targetSize);
 }
 
-void Player::refreshPixmap(const QSize &targetSize)
+void VideoWallpaperPlayer::refreshPixmap(const QSize &targetSize)
 {
     if (m_currentPixmapPath.isEmpty()) {
         return;
@@ -226,7 +226,7 @@ void Player::refreshPixmap(const QSize &targetSize)
     applyCachedPixmap(m_currentPixmapPath, targetSize);
 }
 
-void Player::applyCachedPixmap(const QString &path, const QSize &targetSize)
+void VideoWallpaperPlayer::applyCachedPixmap(const QString &path, const QSize &targetSize)
 {
     QPixmap originalPixmap;
     if (g_originalPixmapCache.contains(path)) {
@@ -253,7 +253,7 @@ void Player::applyCachedPixmap(const QString &path, const QSize &targetSize)
     m_pixmapItem->setPixmap(originalPixmap);
 }
 
-void Player::setupMovie(const QString &path)
+void VideoWallpaperPlayer::setupMovie(const QString &path)
 {
     setMoviePlayer(Layer::LAYER_PLAYER_1);
     ptype = PlayerType::MOVIE;
@@ -268,7 +268,7 @@ void Player::setupMovie(const QString &path)
     m_movie->start();
 }
 
-void Player::setupVideo(const QString &path)
+void VideoWallpaperPlayer::setupVideo(const QString &path)
 {
     setVideoPlayer(Layer::LAYER_PLAYER_1);
     ptype = PlayerType::VIDEO;
@@ -289,7 +289,7 @@ void Player::setupVideo(const QString &path)
     m_mediaPlayer->play();
 }
 
-void Player::setVideoSize(const QSize &size)
+void VideoWallpaperPlayer::setVideoSize(const QSize &size)
 {
     if (!m_videoItem || !size.isValid()) return;
     if (m_lastVideoSize == size) return;

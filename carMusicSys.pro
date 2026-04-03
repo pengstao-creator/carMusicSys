@@ -12,6 +12,18 @@ TEMPLATE = app
 TARGET = carMusicSys
 INCLUDEPATH += .
 
+THIRD_PARTY_DIR = $$PWD/thirdparty
+THIRD_PARTY_INC = $$THIRD_PARTY_DIR/inc
+THIRD_PARTY_LIB = $$THIRD_PARTY_DIR/lib
+THIRD_PARTY_BIN = $$THIRD_PARTY_DIR/bin
+
+INCLUDEPATH += $$THIRD_PARTY_INC
+LIBS += -L$$THIRD_PARTY_LIB -ltag
+
+win32 {
+    QMAKE_POST_LINK += $$quote(copy /Y \"$$THIRD_PARTY_BIN\\libtag.dll\" \"$$OUT_PWD\\libtag.dll\")$$escape_expand(\\n\\t)
+}
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # You can make your code fail to compile if you use deprecated APIs.

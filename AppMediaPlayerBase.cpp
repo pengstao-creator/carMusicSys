@@ -35,12 +35,12 @@ QMediaPlayer *AppMediaPlayerBase::playerHandle() const
     return m_player;
 }
 
-void AppMediaPlayerBase::setSource(const QUrl &url)
+void AppMediaPlayerBase::setSource(const QString &url)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    m_player->setSource(url);
+    m_player->setSource(QUrl::fromLocalFile(url));
 #else
-    m_player->setMedia(url);
+    m_player->setMedia(QUrl::fromLocalFile(url));
 #endif
 }
 

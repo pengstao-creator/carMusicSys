@@ -254,9 +254,6 @@ void WeatherUi::resizeEvent(QResizeEvent *event)
     if (backgroundLabel) {
         backgroundLabel->setGeometry(rect());
     }
-    // 尺寸变化时同步刷新两套背景：
-    // 1) backgroundLabel 实图层；
-    // 2) QPalette::Window 画刷层（Qt5 下对某些风格更稳定）。
     if (!backgroundPixmap.isNull()) {
         const QPixmap scaled = backgroundPixmap.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
         if (backgroundLabel) {

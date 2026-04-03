@@ -15,6 +15,7 @@
 #include <QUrl>
 #include <QtGlobal>
 #include <QFileDialog>
+#include "AppMusicPlayer.h"
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QAudioOutput>
 #else
@@ -31,19 +32,17 @@ constexpr const char * ICON_MODE_SEQ = ":/Resource/app/music/shunxubofang.png"; 
 constexpr const char * ICON_MODE_LIST_LOOP = ":/Resource/app/music/liebiaoxunhuan.png";  // 列表循环图标
 constexpr const char * ICON_MODE_SINGLE_LOOP = ":/Resource/app/music/danquxunhuan.png";  // 单曲循环图标
 constexpr const char * ICON_MODE_RANDOM = ":/Resource/app/music/suijibofang.png";  // 随机播放图标
+constexpr const char * ICON_COVERART = ":/Resource/app/music/CD.png";
 }
 
 
 musicUi::musicUi(QWidget *parent)
     : softwareUiBase(parent)
     , ui(new Ui::musicUi)
-    , player(new QMediaPlayer(this))
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    , audioOutput(new QAudioOutput(this))
-#endif
     , currentIndex(-1)
     , modeIndex(0)
     , userSeeking(false)
+    , player(new AppMusicPlayer(this))
 {
     // 预渲染播放模式图标，避免每次切换都重复从资源路径加载。
     playMode.append({PlayMode::Sequential, QPixmap(QString::fromUtf8(ICON_MODE_SEQ))});
@@ -56,27 +55,24 @@ musicUi::musicUi(QWidget *parent)
 void musicUi::initSet()
 {
     ui->setupUi(this);  // 初始化UI
-
     setBackground(QString::fromUtf8(BACKGROUND_ICON));
-
-    //初始化音乐播放器
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    audioOutput->setMuted(true);
-    audioOutput->setVolume(0.0);
-    player->setAudioOutput(audioOutput);
-#endif
-
     if (ui->switchPlaybackType && !playMode.isEmpty()) {
         // 初始化按钮图标为当前模式（默认顺序播放）。
         ui->switchPlaybackType->setIcon(QIcon(playMode[modeIndex].second));
-        ui->switchPlaybackType->setIconSize(QSize(24, 24));
+        ui->switchPlaybackType->setIconSize(ui->switchPlaybackType->size());
     }
+    //设置默认音乐封面
+    dcoverArt = QPixmap(ICON_COVERART);
+
+    //绑定音乐信息加载信号
+    connect(player,&AppMusicPlayer::laodOk,this,&musicUi::setMusicUi);
+
 }
 
 void musicUi::setBackground(const QString &iconpath)
 {
     QString backgroundPath = iconpath.trimmed();
-    auto backgroundPixmap = QPixmap(backgroundPath);
+    backgroundPixmap = QPixmap(backgroundPath);
     if (backgroundLabel) {
         if (!backgroundPixmap.isNull()) {
             const QPixmap scaled = backgroundPixmap.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
@@ -92,6 +88,55 @@ void musicUi::setBackground(const QString &iconpath)
     }
 }
 
+void musicUi::setMusicUi()
+{
+    //切换音乐加载信号完成之后设置该音乐的UI
+    AppMusicPlayer::MusicInfo musicinfo = player->getMusicInfo();
+    if(!musicinfo.CoverArt.isNull())
+    {
+        ui->albumArtLabel->setPixmap(musicinfo.CoverArt);
+    }
+    else
+    {
+        ui->albumArtLabel->setPixmap(dcoverArt);
+        ui->albumArtLabel->setScaledContents(true);
+    }
+    if(musicinfo.Artist.isEmpty())
+    {
+        ui->artistLabel->setText(tr("未知歌手"));
+    }
+    else
+    {
+        ui->artistLabel->setText(musicinfo.Artist);
+    }
+
+    if(musicinfo.Artist.isEmpty())
+    {
+        ui->trackTitleLabel->setText(tr("未知专辑"));
+    }
+    else
+    {
+        ui->trackTitleLabel->setText(musicinfo.AlbumTitle);
+    }
+    if(musicinfo.Title.isEmpty())
+    {
+        ui->titleLabel->setText(tr("未知歌名"));
+    }
+    else
+    {
+        ui->titleLabel->setText(musicinfo.Title);
+    }
+
+    if(musicinfo.Duration.isEmpty())
+    {
+        ui->timeTotalLabel->setText("00.00");
+    }
+    else
+    {
+        ui->timeTotalLabel->setText(musicinfo.Duration);
+    }
+
+}
 
 musicUi::~musicUi()
 {
@@ -161,26 +206,31 @@ void musicUi::on_nextButton_clicked()
 void musicUi::on_playlistButton_clicked()
 {
     //选择播放路径,然后在playlistList中显示
-    QStringList musicFiles = QFileDialog::getOpenFileNames(this,tr("选择歌曲"),"./",tr("文件类型(*.mp3,*.ogg)"));
+    QStringList musicFiles = QFileDialog::getOpenFileNames(this,tr("选择歌曲"),"D:/code/carMusicSys/Music",tr("文件类型(*.*)"));
     QFileInfo filename;//用于提取文件名
     QStringList musicNames;//用本次选择于添加到窗口容器进行显示
+    QString formatFilePath;//将文件路劲格式化保存,使用/分割
     for(auto filePath : musicFiles)
     {
         filename = filePath;
-        //添加去重
-        if(musicPaths.find(filePath) == musicPaths.end())
+        formatFilePath = filename.canonicalFilePath();
+        if(filename.isFile())
         {
-//            musicPaths.insert(filePath,musicInfos.size());
-            //需要提取该文件的各种信息
-
-//            musicInfos.append(filePath);
-            musicNames.append(filename.baseName());
+            //添加去重
+            if(OncePaths.isEmpty() || OncePaths.find(filename.baseName()) == OncePaths.end())
+            {
+                OncePaths.insert(filename.baseName(),musicFiles.size());
+                musicFilePaths.append(formatFilePath);
+                musicNames.append(filename.baseName());
+            }
         }
     }
 
-    if(ui->playlistList)
+    if(ui->playlistList && !musicNames.isEmpty())
     {
         ui->playlistList->addItems(musicNames);
+        qDebug() << musicFilePaths;
+        player->setSource(musicFilePaths[0]);
     }
 }
 
