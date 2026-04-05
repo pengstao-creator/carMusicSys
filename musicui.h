@@ -7,7 +7,7 @@
 #include <QVector>
 #include <QHash>
 class QListWidgetItem;  // 前向声明Qt列表项类
-
+class QPushButton;
 namespace Ui {
 class musicUi;  // 前向声明UI类
 }
@@ -45,10 +45,19 @@ private slots:
 
     void on_playlistButton_clicked();
 
+    void on_volumeButton_clicked();
+
+    void on_volumeSlider_actionTriggered(int action);
+
+
+
+    void on_playlistList_currentTextChanged(const QString &currentText);
+
+    void on_progressSlider_actionTriggered(int action);
+
 private:
 
     enum class PlayMode {
-        Sequential,  // 顺序播放
         ListLoop,    // 列表循环
         SingleLoop,  // 单曲循环
         Random       // 随机播放
@@ -58,17 +67,23 @@ private:
 
     void initSet();
     void setBackground(const QString& iconpath);
-    void setMusicUi();
-
+    void setMusicUi();//不需要主动调用通过信号延迟调用
+    void setMusic(const QString& name);//设置音乐
+    void setMusic(int index);
+    void setButtonIcon(QPushButton * but,const QIcon& icon);
+    QString toMMSS(int seconds);
 
     Ui::musicUi *ui;  // UI对象指针
     int currentIndex;  // 当前播放索引
     int modeIndex;
+    bool isPlay; //音乐是否播放
+    bool isMuted;
     bool userSeeking;  // 用户是否正在拖动进度条
     AppMusicPlayer * player;
     QList<QString> musicFilePaths;//保存音乐完整路径用
     QHash<QString,int> OncePaths;//用于根据文件路径进行去重，和歌名快速搜索返回索引
     QVector<std::pair<PlayMode,QPixmap>> playMode;  // 播放模式
+
     QPixmap dcoverArt;
 };
 

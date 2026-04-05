@@ -13,7 +13,7 @@ class AppMusicPlayer : public AppMediaPlayerBase
 public:
     struct MusicInfo
     {
-        QString Duration; //时长
+        int Duration; //时长
         QString Title; //标题
         QString Artist;//艺术家
         QString AlbumTitle;

@@ -77,15 +77,8 @@ void AppMusicPlayer::getMetaData()
     musicInfo.Artist = tagStringToQString(tag->artist());
     musicInfo.AlbumTitle = tagStringToQString(tag->album());
     if (f.audioProperties()) {
-        int seconds = f.audioProperties()->lengthInSeconds();
-        int minutes = seconds / 60;
-        int secs = seconds % 60;
-        musicInfo.Duration = QString("%1:%2")
-                                .arg(minutes)
-                                .arg(secs, 2, 10, QChar('0'));
-
+        musicInfo.Duration = f.audioProperties()->lengthInSeconds();
     }
-
     const QString suffix = QFileInfo(musicInfo.filepath).suffix().toLower();
     QImage coverImage;
     if (suffix == "mp3") {
@@ -99,8 +92,6 @@ void AppMusicPlayer::getMetaData()
         musicInfo.CoverArt = QPixmap::fromImage(coverImage);
     }
     
-
-
     qDebug() << "AlbumTitle:"<< musicInfo.AlbumTitle;
     qDebug() << "Artist:"<<musicInfo.Artist;
     qDebug() << "Title:"<<musicInfo.Title;
@@ -115,7 +106,7 @@ void AppMusicPlayer::cleanMusicInfo()
     musicInfo.AlbumTitle.clear();
     musicInfo.Artist.clear();
     musicInfo.CoverArt = QPixmap();
-    musicInfo.Duration.clear();
+    musicInfo.Duration = 0;
     musicInfo.filepath.clear();
 }
 

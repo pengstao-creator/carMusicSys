@@ -174,7 +174,7 @@
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QPushButton { image: url(:/Resource/app/music/bofangliebiao.png); }</string>
+            <string notr="true"/>
            </property>
            <property name="text">
             <string/>
@@ -249,7 +249,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QSlider" name="progressSlider">
+        <widget class="ClickableSlider" name="progressSlider">
          <property name="maximum">
           <number>1000</number>
          </property>
@@ -272,6 +272,19 @@
        <property name="spacing">
         <number>12</number>
        </property>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <widget class="QPushButton" name="switchPlaybackType">
          <property name="minimumSize">
@@ -301,19 +314,6 @@
         </widget>
        </item>
        <item>
-        <spacer name="leftControlsSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>10</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <widget class="QPushButton" name="prevButton">
          <property name="minimumSize">
           <size>
@@ -328,7 +328,7 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QPushButton { image: url(:/Resource/app/music/shangyiqu.png); }</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string/>
@@ -350,7 +350,7 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QPushButton { image: url(:/Resource/app/music/bofangzhong.png); }</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string/>
@@ -372,60 +372,12 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QPushButton { image: url(:/Resource/app/music/xiayiqu.png); }</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string/>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="centerControlsSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>10</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="queueButton">
-         <property name="minimumSize">
-          <size>
-           <width>38</width>
-           <height>38</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>38</width>
-           <height>38</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { image: url(:/Resource/app/music/bofangduilie.png); }</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="rightSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item>
         <widget class="QPushButton" name="volumeButton">
@@ -442,7 +394,7 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QPushButton { image: url(:/Resource/app/music/yinliang.png); }</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string/>
@@ -450,7 +402,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QSlider" name="volumeSlider">
+        <widget class="ClickableSlider" name="volumeSlider">
          <property name="minimumSize">
           <size>
            <width>140</width>
@@ -468,12 +420,32 @@
          </property>
         </widget>
        </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ClickableSlider</class>
+   <extends>QSlider</extends>
+   <header>clickableslider.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

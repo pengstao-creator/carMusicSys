@@ -11,7 +11,7 @@
 
 namespace {
 constexpr const char *kProjectRootName = "carMusicSys";
-constexpr const char *kWallpaperDirSuffix = "/Wallpaper/";
+constexpr const char *kWallpaperDirSuffix = "D:/code/github/car-music-sys/Wallpaper/";
 constexpr const char *kAppIconPath = ":/Resource/app/common/app_icon.jpg";
 constexpr const char *kOverlayDesktop = "dosktop";
 }
@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     , wallpaper(new WallpaperLoad(zAxisCtrl,this))
 {
     // 获取Wallpaper目录路径
-    path = getWallpaperPath();
+    path = kWallpaperDirSuffix;
     
     ui->setupUi(this);
 

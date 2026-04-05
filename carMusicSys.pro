@@ -38,6 +38,7 @@ CONFIG += c++17
 
 # Input
 HEADERS += Data.h \
+           clickableslider.h \
            AppMediaPlayerBase.h \
            AppMusicPlayer.h \
            AppThreadPool.h \
@@ -67,6 +68,7 @@ FORMS += desktop.ui mainwindow.ui overlay.ui \
     weatherUi.ui
 
 SOURCES += desktop.cpp \
+           clickableslider.cpp \
            AppMediaPlayerBase.cpp \
            AppMusicPlayer.cpp \
            AppThreadPool.cpp \
