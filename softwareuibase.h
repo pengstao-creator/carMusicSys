@@ -10,6 +10,7 @@ class QPixmap;
 class QResizeEvent;
 class QString;
 class QLabel;
+class zAxisControl;
 class softwareUiBase : public QWidget
 {
     Q_OBJECT
@@ -17,10 +18,8 @@ public:
     explicit softwareUiBase(QWidget *parent = nullptr);
     qreal uiScaleFactor() const;
     void setDesignSize(const QSize &size);
+    void setzAxisControl(zAxisControl * zAxisCtrl);
     QSize designSize() const;
-    static const QString& getSoftname();
-    static const QPixmap& getSofticon();
-    static softwareUiBase * getSingleton();
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 signals:
@@ -32,6 +31,7 @@ protected:
     virtual void onUiScaleChanged(qreal scaleFactor);
     QLabel * backgroundLabel;
     QPixmap backgroundPixmap;
+    zAxisControl * _zAxisCtrl;
 private:
     QSize m_designSize;
     qreal m_uiScaleFactor;

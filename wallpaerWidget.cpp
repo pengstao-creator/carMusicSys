@@ -59,20 +59,10 @@ void wallpaerWidget::setPlayer()
 
 wallpaerWidget::~wallpaerWidget()
 {
-    // Player 内部图元由 unique_ptr 管理，但图元同时挂在 QGraphicsScene。
-    // 析构前先从 scene 移除，避免退出阶段 scene 与 item 双向销毁产生冲突。
-    if (!zAxis_Ctrl || !zAxis_Ctrl->getScene()) {
-        return;
-    }
-    auto scene = zAxis_Ctrl->getScene();
-    if (m_player_1) {
-        if (m_player_1->getPixmapItem()) scene->removeItem(m_player_1->getPixmapItem());
-        if (m_player_1->getVideoItem()) scene->removeItem(m_player_1->getVideoItem());
-    }
-    if (m_player_2) {
-        if (m_player_2->getPixmapItem()) scene->removeItem(m_player_2->getPixmapItem());
-        if (m_player_2->getVideoItem()) scene->removeItem(m_player_2->getVideoItem());
-    }
+    // 图元生命周期由 QGraphicsScene 托管，退出阶段不再主动 remove/delete，
+    // 避免与 scene 销毁链发生双重释放/悬空访问。
+    if (m_player_1) m_player_1->stop();
+    if (m_player_2) m_player_2->stop();
 }
 void wallpaerWidget::setPathFirst(const QString &filePath1, const QString &filePath2)
 {
@@ -86,7 +76,7 @@ void wallpaerWidget::setPathFirst(const QString &filePath1, const QString &fileP
     m_player_2->hidePlayer(PlayerType::NONPLAYER);
     // 设置当前文件名为第二个文件的文件名
     QFileInfo info(filePath2);
-    m_currentFile = info.fileName();
+    m_currentFile = info.absoluteFilePath();
 }
 
 void wallpaerWidget::stop()
@@ -132,7 +122,7 @@ void wallpaerWidget::pause()
 void wallpaerWidget::setPath(const QString &filePath)
 {
     QFileInfo info(filePath);
-    if (m_currentFile == info.fileName()) {
+    if (m_currentFile == info.absoluteFilePath()) {
         return;
     }
 
@@ -151,7 +141,7 @@ void wallpaerWidget::setPath(const QString &filePath)
     currentPlayer->hidePlayer(PlayerType::NONPLAYER);
     is_player_1 = !is_player_1;
     // 只存储文件名，而不是完整路径
-    m_currentFile = info.fileName();
+    m_currentFile = info.absoluteFilePath();
 
 }
 

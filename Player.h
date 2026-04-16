@@ -41,8 +41,8 @@ public:
     bool showPlayer(PlayerType);
     
     // 访问器方法
-    QGraphicsPixmapItem* getPixmapItem() const { return m_pixmapItem.get(); }
-    QGraphicsVideoItem* getVideoItem() const { return m_videoItem.get(); }
+    QGraphicsPixmapItem* getPixmapItem() const { return m_pixmapItem; }
+    QGraphicsVideoItem* getVideoItem() const { return m_videoItem; }
     QMediaPlayer* getMediaPlayer() const { return m_mediaPlayer.get(); }
     PlayerType getCurrentPlayerType() const { return ptype; }
     
@@ -55,10 +55,10 @@ private:
     void setMoviePlayer(const qreal z);
     void setAudioPlayer();
     void applyCachedPixmap(const QString &path, const QSize &targetSize);
-    std::unique_ptr<QGraphicsPixmapItem> m_pixmapItem;  // 静态图片项
-    std::unique_ptr<QGraphicsVideoItem> m_videoItem;    // 视频项
+    QGraphicsPixmapItem *m_pixmapItem;  // 由 QGraphicsScene 托管
+    QGraphicsVideoItem *m_videoItem;    // 由 QGraphicsScene 托管
     std::unique_ptr<QMovie> m_movie;                    // GIF播放器
-    std::unique_ptr<QGraphicsPixmapItem> m_MovieItem;    //gif图片展示
+    QGraphicsPixmapItem *m_MovieItem;    // 由 QGraphicsScene 托管
     std::unique_ptr<QMediaPlayer> m_mediaPlayer;        // 视频播放器
     // 条件编译以支持Qt5
     #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)

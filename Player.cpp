@@ -45,7 +45,10 @@ VideoWallpaperPlayer::VideoWallpaperPlayer(QObject *parent)
 
 VideoWallpaperPlayer::~VideoWallpaperPlayer()
 {
-    // 智能指针会自动管理内存，不需要手动释放
+    // m_pixmapItem/m_videoItem/m_MovieItem 由 scene 托管，这里不做 delete。
+    m_pixmapItem = nullptr;
+    m_videoItem = nullptr;
+    m_MovieItem = nullptr;
 }
 
 void VideoWallpaperPlayer::setWallpaperPlayer(const qreal z)
@@ -59,7 +62,7 @@ void VideoWallpaperPlayer::setWallpaperPlayer(const qreal z)
 void VideoWallpaperPlayer::setPixmapPlayer(const qreal z)
 {
     if (!m_pixmapItem) {
-        m_pixmapItem = std::make_unique<QGraphicsPixmapItem>();
+        m_pixmapItem = new QGraphicsPixmapItem();
     }
     m_pixmapItem->setZValue(z);          // 底层
     m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
@@ -69,7 +72,7 @@ void VideoWallpaperPlayer::setPixmapPlayer(const qreal z)
 void VideoWallpaperPlayer::setVideoPlayer(const qreal z)
 {
     if (!m_videoItem) {
-        m_videoItem = std::make_unique<QGraphicsVideoItem>();
+        m_videoItem = new QGraphicsVideoItem();
     }
     if (!m_mediaPlayer) {
         m_mediaPlayer = std::make_unique<QMediaPlayer>();
@@ -87,7 +90,7 @@ void VideoWallpaperPlayer::setVideoPlayer(const qreal z)
     // Qt5使用setVideoOutput直接连接
     #endif
     
-    m_mediaPlayer->setVideoOutput(m_videoItem.get());
+    m_mediaPlayer->setVideoOutput(m_videoItem);
 
     // 循环播放
     if (!m_videoSignalsConnected) {
@@ -104,13 +107,13 @@ void VideoWallpaperPlayer::setVideoPlayer(const qreal z)
 void VideoWallpaperPlayer::setMoviePlayer(const qreal z)
 {
     if (!m_MovieItem) {
-        m_MovieItem = std::make_unique<QGraphicsPixmapItem>();
+        m_MovieItem = new QGraphicsPixmapItem();
     }
     if (!m_movie) {
         m_movie = std::make_unique<QMovie>();
     }
     if (!m_pixmapItem) {
-        m_pixmapItem = std::make_unique<QGraphicsPixmapItem>();
+        m_pixmapItem = new QGraphicsPixmapItem();
     }
     m_MovieItem->setZValue(z);
     // 连接帧更新信号

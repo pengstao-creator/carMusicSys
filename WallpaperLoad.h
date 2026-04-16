@@ -11,7 +11,6 @@ class WallpaperLoad : public QObject
 public:
     explicit WallpaperLoad(zAxisControl * zAxis_Ctrl,QObject *parent = nullptr);
     ~WallpaperLoad();
-    void setwallpaerWidget(wallpaerWidget *widget);
     void setPath(const QString &path);
     wallpaerWidget* getwallpaerWidget() const;
     void stop();
@@ -25,7 +24,6 @@ private:
     QTimer *_switchTime;
     wallpaerWidget *_wallpaper;
     QStringList _wallpapers;
-    QString _path;
     zAxisControl * zAxisCtrl;
 };
 

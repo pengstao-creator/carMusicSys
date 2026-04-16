@@ -27,7 +27,12 @@ signals:
     void wallpaperStop();
     void wallpaperStart();
     void wallpaperPause();
+    void switchWallpaperPath(const QString& path);
+    void switchWpDur(int second);
+    void isPathInvalid();//路径无效
     void resized();
+    //用于切换壁纸路径
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 private:

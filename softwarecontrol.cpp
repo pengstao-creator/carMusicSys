@@ -70,6 +70,7 @@ void softwareControl::openSoftware(const QString &name)
         if(softWidget == nullptr){return;}
         if(zAxisCtrl->getOverlay(name) == nullptr)
         {
+            softWidget->setzAxisControl(zAxisCtrl);
             //添加软件窗口
             zAxisCtrl->addOvrlay(name,softWidget,true);
             connect(softWidget,&softwareUiBase::exit,this,[this,softWidget](){

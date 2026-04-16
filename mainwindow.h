@@ -25,18 +25,12 @@ private slots:
 private:
     void setMainWindow();
     void setWallpaper();
-    void switchWallpaper();
-    void setTime();
     void addWdiget();
-    void addOverlay(const QString& name,QWidget * widget);
-    QString getWallpaperPath();
 private:
     Ui::MainWindow *ui;
     QString path ;
     zAxisControl * zAxisCtrl;
     WallpaperLoad * wallpaper;
-
-
 };
 
 #endif // MAINWINDOW_H

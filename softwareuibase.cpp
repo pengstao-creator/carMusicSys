@@ -37,26 +37,17 @@ void softwareUiBase::setDesignSize(const QSize &size)
     m_designSize = size;
 }
 
+void softwareUiBase::setzAxisControl(zAxisControl *zAxisCtrl)
+{
+    if(zAxisCtrl)
+    {
+        _zAxisCtrl = zAxisCtrl;
+    }
+}
+
 QSize softwareUiBase::designSize() const
 {
     return m_designSize;
-}
-
-const QString &softwareUiBase::getSoftname()
-{
-    static const QString softName;
-    return softName;
-}
-
-const QPixmap &softwareUiBase::getSofticon()
-{
-    static const QPixmap softIcon;
-    return softIcon;
-}
-
-softwareUiBase *softwareUiBase::getSingleton()
-{
-    return nullptr;
 }
 
 void softwareUiBase::paintEvent(QPaintEvent *event)

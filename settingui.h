@@ -23,6 +23,12 @@ public:
 private slots:
     void on_exitButton_clicked();
 
+    void on_applySwitchDurationButton_clicked();
+
+    void on_changeWallpaperPathButton_clicked();
+
+    void on_switchDurationSpinBox_textChanged(const QString &arg1);
+
 private:
     Ui::settingUi *ui;
 };
